@@ -4,12 +4,12 @@ import { getFirestore } from 'firebase/firestore';
 import { addDoc, collection, doc, getDoc, getDocs, onSnapshot, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDB2eiFyHlsw4REW4DZ40cBIPyL9-fAHoY",
-  authDomain: "chat-app-4e059.firebaseapp.com",
-  projectId: "chat-app-4e059",
-  storageBucket: "chat-app-4e059.firebasestorage.app",
-  messagingSenderId: "1040112516008",
-  appId: "1:1040112516008:web:42fcbb47028a20a9adfb9d"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 const app = initializeApp(firebaseConfig);
