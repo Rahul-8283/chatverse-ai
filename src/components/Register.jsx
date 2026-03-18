@@ -36,7 +36,8 @@ const Register = ({isLogin, setIsLogin}) => {
             toast.error("Email is required");
             return;
         }
-
+        
+        
         if (!validateEmail(userData?.email)) {
             toast.error("Please enter a valid email address");
             return;
