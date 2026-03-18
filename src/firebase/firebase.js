@@ -27,7 +27,6 @@ export const listenForChats = (setChats) => {
 
     setChats(filteredChats);
   });
-
   return unsubscribe;
 };
 
