@@ -27,7 +27,6 @@ export const listenForChats = (setChats) => {
 
     setChats(filteredChats);
   });
-
   return unsubscribe;
 };
 
@@ -75,115 +74,77 @@ export const listenForMessages = (chatId, setMessages) => {
   })
 }
 
+/**
+ * Initialize AI Bot user in Firestore
+ * Creates AI assistant user if it doesn't exist
+ */
+export const initializeAIBot = async () => {
+  try {
+    const aiBotRef = doc(db, "users", "ai-assistant-bot");
+    const aiBotDoc = await getDoc(aiBotRef);
+
+    // If AI Bot doesn't exist, create it
+    if (!aiBotDoc.exists()) {
+      await setDoc(aiBotRef, {
+        uid: "ai-assistant-bot",
+        fullName: "ChatVerse AI",
+        username: "chatverse-ai",
+        email: "bot@chatverse.ai",
+        image: "",
+        // image: "https://via.placeholder.com/150?text=AI+Bot",
+        isBot: true,
+        createdAt: serverTimestamp(),
+      });
+      console.log("✅ AI Bot user created successfully");
+    } else {
+      console.log("✅ AI Bot user already exists");
+    }
+  } catch (error) {
+    console.error("Error initializing AI Bot:", error);
+  }
+};
+
+/**
+ * Save AI conversation to Firestore
+ */
+export const saveAIMessage = async (userId, conversationId, messageText, sender) => {
+  try {
+    const messageRef = collection(db, "ai-chats", userId, "conversations", conversationId, "messages");
+    
+    await addDoc(messageRef, {
+      text: messageText,
+      sender: sender, // "user" or "ai"
+      timestamp: serverTimestamp(),
+    });
+  } catch (error) {
+    console.error("Error saving AI message:", error);
+    throw error;
+  }
+};
+
+/**
+ * Get AI conversation messages
+ */
+export const listenForAIMessages = (userId, conversationId, setMessages) => {
+  try {
+    const messageRef = collection(db, "ai-chats", userId, "conversations", conversationId, "messages");
+    
+    const unsubscribe = onSnapshot(messageRef, (snapshot) => {
+      const messages = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setMessages(messages);
+    }, (error) => {
+      console.error("Error listening for AI messages:", error);
+      throw error;
+    });
+
+    return unsubscribe;
+  } catch (error) {
+    console.error("Error setting up AI messages listener:", error);
+    throw error;
+  }
+};
+
 export { auth, db };
-
-
-// import { initializeApp } from "firebase/app";
-// import { getAuth } from "firebase/auth";
-// import { addDoc, collection, doc, getDoc, getDocs, getFirestore, onSnapshot, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
-
-// // TODO: Add SDKs for Firebase products that you want to use
-// // https://firebase.google.com/docs/web/setup#available-libraries
-
-// // Your web app's Firebase configuration
-// const firebaseConfig = {
-//   apiKey: "AIzaSyDB2eiFyHlsw4REW4DZ40cBIPyL9-fAHoY",
-//   authDomain: "chat-app-4e059.firebaseapp.com",
-//   projectId: "chat-app-4e059",
-//   storageBucket: "chat-app-4e059.firebasestorage.app",
-//   messagingSenderId: "1040112516008",
-//   appId: "1:1040112516008:web:42fcbb47028a20a9adfb9d"
-// };
-
-// // Initialize Firebase
-// const app = initializeApp(firebaseConfig);
-// const auth = getAuth(app);
-// const db = getFirestore(app);
-
-// export const listenForChats = (setChats) => {
-//     const chatsRef = collection(db, "chats");
-//     const unsubscribe = onSnapshot(chatsRef, (snapshot) => {
-//         const chatList = snapshot.docs.map((doc) => ({
-//             id: doc.id,
-//             ...doc.data(),
-//         }));
-
-//         const filteredChats = chatList.filter((chat) => chat?.users?.some((user) => user.email === auth.currentUser.email));
-
-//         setChats(filteredChats);
-//     });
-
-//     return unsubscribe;
-// };
-
-// export const sendMessage = async (messageText, chatId, user1, user2) => {
-//   const chatRef = doc(db, "chats", chatId);
-
-//   const user1Doc = await getDoc(doc(db, "users", user1));
-//   const user2Doc = await getDoc(doc(db, "users", user2));
-
-//   console.log(user1Doc);
-//   console.log(user2Doc);
-
-//   const user1Data = user1Doc.data();
-//   const user2Data = user2Doc.data();
-
-//   const chatDoc = await getDoc(chatRef);
-//   if (!chatDoc.exists()) {
-//     await setDoc(chatRef, {
-//       users: [user1Data, user2Data],
-//       lastMessage: messageText,
-//       lastMessageTimestamp: serverTimestamp(),
-//     });
-//   } else {
-//     await updateDoc(chatRef, {
-//       lastMessage: messageText,
-//       lastMessageTimestamp: serverTimestamp(),
-//     });
-//   }
-
-// const messageRef = collection(db, "chats", chatId, "messages");
-
-// await addDoc(messageRef, {
-//   text: messageText,
-//   sender: auth.currentUser.email,
-//   timestamp: serverTimestamp(),
-// });
-// };
-
-// export const listenForMessages = (chatId, setMessages) => {
-//     const chatRef = collection(db, "chats", chatId, "messages");
-//     onSnapshot(chatRef, (snapshot) => {
-//         const messages = snapshot.docs.map((doc) => doc.data());
-//         setMessages(messages);
-//     });
-// };
-
-// // Function to update user images (Note, we did not use this function in the project tutorial)
-// // export async function updateUsersImages() {
-// //     // Step 1: Fetch the users collection from Firestore
-// //     const usersRef = collection(db, "users");
-// //     const querySnapshot = await getDocs(usersRef);
-
-// //     // Step 2: Loop through the users and update the image field using `for...of`
-// //     let index = 1; // Start with img=1
-
-// //     // Use a for...of loop to handle async calls sequentially
-// //     for (const docSnapshot of querySnapshot.docs) {
-// //         const userDoc = doc(db, "users", docSnapshot.id);
-
-// //         // Construct the new image URL
-// //         const imageUrl = `https://i.pravatar.cc/150?img=${index}`;
-
-// //         // Step 3: Update the user document with the new image URL
-// //         await updateDoc(userDoc, {
-// //             image: imageUrl, // assuming 'image' is the field to update
-// //         });
-
-// //         index++; // Increment the image number for the next user
-// //     }
-
-// //     console.log("All user images updated successfully!");
-// // }
-
-// export { auth, db };

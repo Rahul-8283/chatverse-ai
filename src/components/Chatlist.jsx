@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import default1 from "../assets/default1.jpg"
 import { RiMore2Fill } from 'react-icons/ri';
 import SearchModal from './SearchModal';
 import chatData from '../data/chats';
 import formatTimestamp from '../utils/formatTimestamp.js';
 import { auth, db, listenForChats } from '../firebase/firebase.js';
 import { onSnapshot, doc } from 'firebase/firestore';
+import default1 from "../assets/default1.jpg";
 
 const Chatlist = ({ setSelectedUser }) => {
   const [chats, setChats] = useState([]);
   const [user, setUser] = useState(null);
+  const [aiBot, setAiBot] = useState(null);
 
   useEffect(() => {
     const userDocRef = doc(db, "users", auth?.currentUser?.uid);
@@ -18,6 +19,26 @@ const Chatlist = ({ setSelectedUser }) => {
     });
 
     return () => unsubscribe();
+  }, []);
+
+  // Fetch AI Bot user
+  useEffect(() => {
+    const fetchAIBot = async () => {
+      try {
+        const aiBotRef = doc(db, "users", "ai-assistant-bot");
+        const unsubscribe = onSnapshot(aiBotRef, (doc) => {
+          if (doc.exists()) {
+            setAiBot(doc.data());
+          }
+        });
+
+        return () => unsubscribe();
+      } catch (error) {
+        console.error("Error fetching AI Bot:", error);
+      }
+    };
+
+    fetchAIBot();
   }, []);
 
   useEffect(() => {
@@ -64,13 +85,36 @@ const Chatlist = ({ setSelectedUser }) => {
       </div>
 
       <main className='flex flex-col items-start mt-[1.5rem] pb-3'>
+        {/* AI Bot - Display like normal chats */}
+        {aiBot && (
+          <button
+            onClick={() => setSelectedUser(aiBot)}
+            className="flex items-start justify-between w-[100%] border-b border-[#9090902c] px-5 py-3 hover:bg-[#f9f9f9] transition"
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-[40px] h-[40px] rounded-full bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center flex-shrink-0">
+                <span className="text-white font-bold text-xl">🤖</span>
+              </div>
+              <span>
+                <h2 className="p-0 font-semibold text-[#2A3d39] text-left text-[17px]">
+                  ChatVerse AI
+                </h2>
+                <p className="p-0 font-light text-[#2A3d39] text-left text-[14px]">
+                  @{aiBot?.username || "chatverse-ai"}
+                </p>
+              </span>
+            </div>
+          </button>
+        )}
+
+        {/* Regular User Chats */}
         {sortedChats?.map((chat) => (
-          <button key={chat?.id} className="flex items-start justify-between w-[100%] border-b border-[#9090902c] px-5 py-3">
+          <button key={chat?.id} className="flex items-start justify-between w-[100%] border-b border-[#9090902c] px-5 py-3 hover:bg-[#f9f9f9] transition">
             {chat?.users
               ?.filter((user) => user?.email !== auth?.currentUser?.email)
               ?.map((user) => (
                 <>
-                  <div className="flex items-start gap-3" onClick={() => startChat(user)} >
+                  <div className="flex items-start gap-3" onClick={() => setSelectedUser(user)} >
                     <img src={user?.image || default1} className="h-[40px] w-[40px] rounded-full object-cover" alt="" />
                     <span>
                       <h2 className="p-0 font-semibold text-[#2A3d39] text-left text-[17px]">{user?.fullName || "ChatFrik User"}</h2>
