@@ -5,8 +5,6 @@ import { chatWithAI } from '../utils/geminiAPI';
 import { saveAIMessage, listenForAIMessages } from '../firebase/firebase';
 import formatTimestamp from '../utils/formatTimestamp';
 import { auth } from '../firebase/firebase';
-
-import botAvatar from "../assets/bot-avatar.png";
 import default1 from "../assets/default1.jpg";
 
 const AIChatbot = () => {
@@ -172,11 +170,9 @@ const AIChatbot = () => {
                 ) : (
                   // AI Message
                   <span className="flex gap-3 w-[40%] h-auto lg:ms-6 ms-2">
-                    <img
-                      src={botAvatar}
-                      className="h-11 w-11 object-cover rounded-full flex-shrink-0"
-                      alt="AI Bot"
-                    />
+                    <div className="w-11 h-11 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center flex-shrink-0">
+                      <span className="text-white font-bold text-lg">🤖</span>
+                    </div>
                     <div>
                       <div className="flex items-start bg-white justify-start p-4 rounded-lg shadow-sm break-words">
                         <p className="text-sm md:text-base text-[#2A3D39]">
