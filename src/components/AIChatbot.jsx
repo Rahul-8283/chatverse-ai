@@ -93,10 +93,24 @@ const AIChatbot = () => {
         aiResponse,
         "ai"
       );
+      toast.success("✅ Message received!");
 
     } catch (error) {
       console.error("Error in chat:", error);
-      toast.error("Failed to process message. Please try again.");
+      toast.dismiss();
+      
+      // More specific error messages
+      const errorMsg = error?.message ? String(error.message) : String(error);
+      
+      if (errorMsg.includes("429") || errorMsg.includes("rate limit from server")) {
+        toast.error("⏱️ Server rate limit reached. Please wait 30 seconds.");
+      } else if (errorMsg.includes("API key")) {
+        toast.error("❌ Invalid Gemini API key. Check .env file.");
+      } else if (errorMsg.includes("permission") || errorMsg.includes("PERMISSION")) {
+        toast.error("❌ Permission denied. Check Firestore rules.");
+      } else {
+        toast.error(`❌ Error: ${errorMsg}`);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -113,8 +127,8 @@ const AIChatbot = () => {
             </div>
           </span>
           <span>
-            <h3 className="font-semibold text-[#2A3D39] text-lg">ChatBot AI</h3>
-            <p className="font-light text-[#2A3D39] text-sm">@ai-assistant</p>
+            <h3 className="font-semibold text-[#2A3D39] text-lg">ChatVerse AI</h3>
+            <p className="font-light text-[#2A3D39] text-sm">@chatverse-ai</p>
           </span>
         </main>
       </header>
@@ -127,7 +141,7 @@ const AIChatbot = () => {
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full text-center py-10">
                 <div className="text-6xl mb-4">🤖</div>
-                <h2 className="text-2xl font-bold text-[#2A3D39] mb-2">Welcome to ChatBot AI</h2>
+                <h2 className="text-2xl font-bold text-[#2A3D39] mb-2">Welcome to ChatVerse AI</h2>
                 <p className="text-gray-500 mb-4">Ask me anything and I'll help you out!</p>
                 <div className="text-sm text-gray-400">
                   <p>✨ Ask questions</p>
@@ -141,7 +155,7 @@ const AIChatbot = () => {
             {sortedMessages?.map((msg, index) => (
               <div
                 key={index}
-                className={`flex flex-col items-${msg?.sender === "user" ? "end" : "start"} w-full mb-5`}
+                className={msg?.sender === "user" ? "flex flex-col items-end w-full mb-5" : "flex flex-col items-start w-full mb-5"}
               >
                 {msg?.sender === "user" ? (
                   // User Message
