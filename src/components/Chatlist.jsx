@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import default1 from "../assets/default1.jpg"
 import { RiMore2Fill } from 'react-icons/ri';
 import SearchModal from './SearchModal';
 import chatData from '../data/chats';
 import formatTimestamp from '../utils/formatTimestamp.js';
 import { auth, db, listenForChats } from '../firebase/firebase.js';
 import { onSnapshot, doc } from 'firebase/firestore';
+
+import botAvatar from "../assets/bot-avatar.png";
+import default1 from "../assets/default1.jpg";
 
 const Chatlist = ({ setSelectedUser }) => {
   const [chats, setChats] = useState([]);
@@ -92,7 +94,7 @@ const Chatlist = ({ setSelectedUser }) => {
             className="flex items-start justify-between w-[100%] border-b border-[#9090902c] px-5 py-3 hover:bg-[#f9f9f9] transition"
           >
             <div className="flex items-start gap-3">
-              <img src={aiBot?.image || default1} className="h-[40px] w-[40px] rounded-full object-cover" alt="ChatVerse AI" />
+              <img src={botAvatar} className="h-[40px] w-[40px] rounded-full object-cover" alt="ChatVerse AI" />
               <span>
                 <h2 className="p-0 font-semibold text-[#2A3d39] text-left text-[17px]">
                   ChatVerse AI

@@ -4,8 +4,10 @@ import { RiSendPlaneFill, RiLoader4Line } from "react-icons/ri";
 import { chatWithAI } from '../utils/geminiAPI';
 import { saveAIMessage, listenForAIMessages } from '../firebase/firebase';
 import formatTimestamp from '../utils/formatTimestamp';
-import default1 from "../assets/default1.jpg";
 import { auth } from '../firebase/firebase';
+
+import botAvatar from "../assets/bot-avatar.png";
+import default1 from "../assets/default1.jpg";
 
 const AIChatbot = () => {
   const [messages, setMessages] = useState([]);
@@ -157,8 +159,8 @@ const AIChatbot = () => {
               >
                 {msg?.sender === "user" ? (
                   // User Message
-                  <div className="flex gap-3 ms-10 lg:me-7 me-2.5 w-[60%] md:w-[40%]">
-                    <div className="flex-1">
+                  <span className="flex gap-3 h-auto ms-10 lg:me-7 me-2.5">
+                    <div>
                       <div className="flex items-center bg-[#01aa85] text-white justify-center p-4 rounded-lg shadow-sm break-words">
                         <h4 className="text-sm md:text-base">{msg?.text}</h4>
                       </div>
@@ -166,18 +168,18 @@ const AIChatbot = () => {
                         {msg?.timestamp ? formatTimestamp(msg?.timestamp) : ""}
                       </p>
                     </div>
-                  </div>
+                  </span>
                 ) : (
                   // AI Message
-                  <div className="flex gap-3 w-full lg:ms-6 ms-2 mb-2">
+                  <span className="flex gap-3 w-[40%] h-auto lg:ms-6 ms-2">
                     <img
-                      src={default1}
-                      className="h-11 w-11 object-cover rounded-full"
+                      src={botAvatar}
+                      className="h-11 w-11 object-cover rounded-full flex-shrink-0"
                       alt="AI Bot"
                     />
-                    <div className="flex-1 w-[60%] md:w-[40%]">
-                      <div className="flex items-start bg-white justify-start p-4 rounded-lg shadow-sm">
-                        <p className="text-sm md:text-base text-[#2A3D39] break-words">
+                    <div>
+                      <div className="flex items-start bg-white justify-start p-4 rounded-lg shadow-sm break-words">
+                        <p className="text-sm md:text-base text-[#2A3D39]">
                           {msg?.text}
                         </p>
                       </div>
@@ -185,7 +187,7 @@ const AIChatbot = () => {
                         {msg?.timestamp ? formatTimestamp(msg?.timestamp) : ""}
                       </p>
                     </div>
-                  </div>
+                  </span>
                 )}
               </div>
             ))}
