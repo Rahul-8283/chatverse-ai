@@ -93,11 +93,9 @@ const AIChatbot = () => {
         aiResponse,
         "ai"
       );
-      toast.success("✅ Message received!");
 
     } catch (error) {
       console.error("Error in chat:", error);
-      toast.dismiss();
       
       // More specific error messages
       const errorMsg = error?.message ? String(error.message) : String(error);
@@ -109,7 +107,7 @@ const AIChatbot = () => {
       } else if (errorMsg.includes("permission") || errorMsg.includes("PERMISSION")) {
         toast.error("❌ Permission denied. Check Firestore rules.");
       } else {
-        toast.error(`❌ Error: ${errorMsg}`);
+        toast.error(`Error: ${errorMsg}`);
       }
     } finally {
       setIsLoading(false);

@@ -15,7 +15,6 @@ const waitBetweenRequests = async () => {
   
   if (timeSinceLastRequest < MIN_DELAY_MS) {
     const delayNeeded = MIN_DELAY_MS - timeSinceLastRequest;
-    console.log(`⏳ Rate limiting: waiting ${Math.ceil(delayNeeded)}ms...`);
     await new Promise(resolve => setTimeout(resolve, delayNeeded));
   }
   
@@ -35,24 +34,15 @@ export const chatWithAI = async (message) => {
       throw new Error("Message cannot be empty");
     }
 
-    // Apply small rate limiting
+    // Apply rate limiting
     await waitBetweenRequests();
 
-    console.log("📡 Calling Gemini API with message:", message.substring(0, 30) + "...");
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     const result = await model.generateContent(message);
     const response = await result.response;
     
-    const aiText = response.text();
-    console.log("✅ Gemini API response received:", aiText.substring(0, 50) + "...");
-    
-    return aiText;
+    return response.text();
   } catch (error) {
-    console.error("❌ Gemini API Error:", {
-      message: error.message,
-      code: error.code
-    });
-    
     // Check for actual rate limit from API
     if (error.message && error.message.includes("429")) {
       throw new Error("API rate limit from server - please wait before trying again");
@@ -72,7 +62,7 @@ export const chatWithContext = async (messages) => {
     // Apply rate limiting
     await waitBetweenRequests();
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     
     // Format messages for context
     const formattedMessages = messages.map(msg => ({

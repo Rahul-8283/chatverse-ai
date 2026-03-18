@@ -109,23 +109,15 @@ export const initializeAIBot = async () => {
  */
 export const saveAIMessage = async (userId, conversationId, messageText, sender) => {
   try {
-    console.log(`💾 Attempting to save message (sender: ${sender}) to ai-chats/${userId}/conversations/${conversationId}/messages`);
-    
     const messageRef = collection(db, "ai-chats", userId, "conversations", conversationId, "messages");
     
-    const docRef = await addDoc(messageRef, {
+    await addDoc(messageRef, {
       text: messageText,
       sender: sender, // "user" or "ai"
       timestamp: serverTimestamp(),
     });
-    
-    console.log(`✅ Message saved successfully with ID: ${docRef.id}`);
   } catch (error) {
-    console.error(`❌ Firestore Error saving AI message:`, {
-      code: error.code,
-      message: error.message,
-      fullError: error
-    });
+    console.error("Error saving AI message:", error);
     throw error;
   }
 };
@@ -135,29 +127,22 @@ export const saveAIMessage = async (userId, conversationId, messageText, sender)
  */
 export const listenForAIMessages = (userId, conversationId, setMessages) => {
   try {
-    console.log(`👂 Setting up listener for ai-chats/${userId}/conversations/${conversationId}/messages`);
-    
     const messageRef = collection(db, "ai-chats", userId, "conversations", conversationId, "messages");
     
     const unsubscribe = onSnapshot(messageRef, (snapshot) => {
-      console.log(`📨 Received ${snapshot.docs.length} messages from Firestore`);
       const messages = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
       setMessages(messages);
     }, (error) => {
-      console.error(`❌ Firestore listener error:`, {
-        code: error.code,
-        message: error.message,
-        fullError: error
-      });
+      console.error("Error listening for AI messages:", error);
       throw error;
     });
 
     return unsubscribe;
   } catch (error) {
-    console.error("❌ Error setting up AI messages listener:", error);
+    console.error("Error setting up AI messages listener:", error);
     throw error;
   }
 };
