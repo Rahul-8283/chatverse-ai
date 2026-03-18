@@ -74,6 +74,74 @@ export const listenForMessages = (chatId, setMessages) => {
   })
 }
 
+/**
+ * Initialize AI Bot user in Firestore
+ * Creates AI assistant user if it doesn't exist
+ */
+export const initializeAIBot = async () => {
+  try {
+    const aiBotRef = doc(db, "users", "ai-assistant-bot");
+    const aiBotDoc = await getDoc(aiBotRef);
+
+    // If AI Bot doesn't exist, create it
+    if (!aiBotDoc.exists()) {
+      await setDoc(aiBotRef, {
+        uid: "ai-assistant-bot",
+        fullName: "ChatBot AI",
+        username: "ai-assistant",
+        email: "bot@chatverse.ai",
+        image: "https://via.placeholder.com/150?text=AI+Bot",
+        isBot: true,
+        createdAt: serverTimestamp(),
+      });
+      console.log("✅ AI Bot user created successfully");
+    } else {
+      console.log("✅ AI Bot user already exists");
+    }
+  } catch (error) {
+    console.error("Error initializing AI Bot:", error);
+  }
+};
+
+/**
+ * Save AI conversation to Firestore
+ */
+export const saveAIMessage = async (userId, conversationId, messageText, sender) => {
+  try {
+    const messageRef = collection(db, "ai-chats", userId, "conversations", conversationId, "messages");
+    
+    await addDoc(messageRef, {
+      text: messageText,
+      sender: sender, // "user" or "ai"
+      timestamp: serverTimestamp(),
+    });
+  } catch (error) {
+    console.error("Error saving AI message:", error);
+    throw error;
+  }
+};
+
+/**
+ * Get AI conversation messages
+ */
+export const listenForAIMessages = (userId, conversationId, setMessages) => {
+  try {
+    const messageRef = collection(db, "ai-chats", userId, "conversations", conversationId, "messages");
+    
+    const unsubscribe = onSnapshot(messageRef, (snapshot) => {
+      const messages = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setMessages(messages);
+    });
+
+    return unsubscribe;
+  } catch (error) {
+    console.error("Error listening for AI messages:", error);
+  }
+};
+
 export { auth, db };
 
 
