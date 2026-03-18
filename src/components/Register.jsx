@@ -35,7 +35,7 @@ const Register = ({isLogin, setIsLogin}) => {
             });
         }
         catch(error){
-            log.console(error);
+            console.log(error);
         }
         finally{
             setIsLoading(false);

@@ -22,7 +22,7 @@ const Login = ({isLogin, setIsLogin}) => {
             await signInWithEmailAndPassword(auth, userData?.email, userData?.password);
         }
         catch(error){
-            log.console(error);
+            console.log(error);
             alert(error.message);
         }
         finally{
