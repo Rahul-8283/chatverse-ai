@@ -114,6 +114,34 @@ const AIChatbot = () => {
     }
   };
 
+  // Helper to format AI markdown responses (boldness, lists, newlines)
+  const formatMessage = (text) => {
+    if (!text) return "";
+    return text.split('\n').map((line, idx) => {
+      let isList = false;
+      let content = line;
+      if (content.trim().startsWith('* ')) {
+        isList = true;
+        content = content.trim().substring(2);
+      }
+      
+      const parts = content.split(/(\*\*.*?\*\*)/g);
+      const formattedLine = parts.map((part, i) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          return <strong key={i} className="font-bold font-semibold">{part.slice(2, -2)}</strong>;
+        }
+        return <span key={i}>{part}</span>;
+      });
+
+      return (
+        <div key={idx} className={`${isList ? 'ml-4 flex gap-2 mt-1.5' : 'mt-1.5'} leading-relaxed`}>
+          {isList && <span className="font-bold inline-block">•</span>}
+          <div className="inline">{formattedLine}</div>
+        </div>
+      );
+    });
+  };
+
   return (
     <section className='flex flex-col items-start justify-start h-screen w-[100%] background-image'>
       {/* Chat Header */}
@@ -132,7 +160,7 @@ const AIChatbot = () => {
       </header>
 
       {/* Chat Messages Area */}
-      <main className="custom-scrollbar relative h-[100vh] w-[100%] flex flex-col justify-between ">
+      <main className="relative h-[100vh] w-[100%] flex flex-col justify-between ">
         <section className="px-3 pt-5 pb-20 lg:pb-10 ">
           <div ref={scrollRef} className="overflow-auto h-[80vh]">
             {/* Welcome Message */}
@@ -159,7 +187,7 @@ const AIChatbot = () => {
                   // User Message
                   <span className="flex gap-3 h-auto ms-10 lg:me-7 me-2.5">
                     <div>
-                      <div className="flex items-center bg-primary text-primary-foreground justify-center p-4 rounded-lg shadow-sm break-words">
+                      <div className="flex items-center bg-primary text-primary-foreground justify-center px-4 py-3 rounded-2xl rounded-tr-sm shadow-sm break-words max-w-[85vw] md:max-w-[60vw]">
                         <h4 className="text-sm md:text-base">{msg?.text}</h4>
                       </div>
                       <p className="text-muted-foreground text-xs mt-1.5 text-right">
@@ -169,15 +197,15 @@ const AIChatbot = () => {
                   </span>
                 ) : (
                   // AI Message
-                  <span className="flex gap-3 w-[40%] h-auto lg:ms-6 ms-2">
-                    <div className="w-11 h-11 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center flex-shrink-0">
+                  <span className="flex gap-3 w-full h-auto lg:ms-6 ms-2">
+                    <div className="w-11 h-11 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center flex-shrink-0 mt-1">
                       <span className="text-white font-bold text-lg">🤖</span>
                     </div>
-                    <div>
-                      <div className="flex items-start bg-card justify-start p-4 rounded-lg shadow-sm break-words">
-                        <p className="text-sm md:text-base text-card-foreground">
-                          {msg?.text}
-                        </p>
+                    <div className="flex-1 max-w-[85vw] md:max-w-[70vw]">
+                      <div className="flex items-start bg-card justify-start px-5 py-3 rounded-2xl rounded-tl-sm shadow-sm break-words overflow-hidden">
+                        <div className="text-sm md:text-base text-card-foreground w-full">
+                          {formatMessage(msg?.text)}
+                        </div>
                       </div>
                       <p className="text-muted-foreground text-xs mt-1.5">
                         {msg?.timestamp ? formatTimestamp(msg?.timestamp) : ""}
@@ -188,20 +216,24 @@ const AIChatbot = () => {
               </div>
             ))}
 
-            {/* Loading Indicator */}
+            {/* AI Typing Indicator */}
             {isLoading && (
-              <div className="flex gap-3 w-full lg:ms-6 ms-2 mb-5">
-                <img
-                  src={default1}
-                  className="h-11 w-11 object-cover rounded-full"
-                  alt="AI Bot"
-                />
-                <div className="flex items-center gap-2 bg-card p-4 rounded-lg shadow-sm">
-                  <RiLoader4Line className="animate-spin text-primary" size={20} />
-                  <span className="text-sm text-muted-foreground">AI is thinking...</span>
-                </div>
+              <div className="flex flex-col items-start w-full mb-5">
+                <span className="flex gap-3 w-full h-auto lg:ms-6 ms-2">
+                  <div className="w-11 h-11 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center flex-shrink-0 mt-1">
+                    <span className="text-white font-bold text-lg">🤖</span>
+                  </div>
+                  <div className="flex items-center gap-3 bg-card px-5 py-4 rounded-2xl rounded-tl-sm shadow-sm w-fit">
+                    <span className="flex gap-1.5 items-center">
+                      <div className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-2 h-2 rounded-full bg-primary/80 animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    </span>
+                  </div>
+                </span>
               </div>
             )}
+
           </div>
         </section>
 

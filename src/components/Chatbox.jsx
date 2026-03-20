@@ -70,7 +70,7 @@ const Chatbox = ({ selectedUser }) => {
             </main>
           </header>
 
-          <main className="custom-scrollbar relative h-[100vh] w-[100%] flex flex-col justify-between ">
+          <main className="relative h-[100vh] w-[100%] flex flex-col justify-between ">
             <section className="px-3 pt-5 b-20 lg:pb-10 ">
               <div ref={scrollRef} className="overflow-auto h-[80vh]">
 
