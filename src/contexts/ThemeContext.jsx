@@ -9,8 +9,8 @@ export const ThemeProvider = ({ children }) => {
     if (savedTheme) {
       return savedTheme;
     }
-    // Fallback to exactly 'light' to start, as requested
-    return 'light';
+    // Fallback to exactly 'dark' to start, as requested
+    return 'dark';
   });
 
   useEffect(() => {
