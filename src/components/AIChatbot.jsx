@@ -15,7 +15,7 @@ const AIChatbot = () => {
   const scrollRef = useRef(null);
   const unsubscribeRef = useRef(null);
 
-  // Generate or get conversation ID on component mount
+  // Generate or get conversation ID on component mount 
   useEffect(() => {
     // Use today's date as conversation ID so all messages in a day are grouped
     const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
