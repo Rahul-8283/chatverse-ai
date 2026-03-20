@@ -58,31 +58,38 @@ const Login = ({isLogin, setIsLogin}) => {
     };
 
     return (
-        <section className="flex flex-col justify-center items-center h-[100vh] background-image">
-            <div className="bg-white shadow-lg p-5 rounded-xl h-[27rem] w-[20rem] flex flex-col justify-center items-center">
-                <div className="mb-14">
-                    <h1 className="text-center text-[28px] font-bold">Sign In</h1>
-                    <p className="text-center text-sm text-gray-400">Welcome back, login to continue</p>
+        <section className="flex flex-col justify-center items-center h-[100vh] background-image relative">
+            <div className="absolute inset-0 bg-background/40 backdrop-blur-[2px]"></div>
+            <div className="bg-card shadow-2xl p-8 sm:p-10 rounded-3xl w-[90%] max-w-[420px] flex flex-col justify-center items-center border border-border/50 relative z-10">
+                <div className="mb-8 w-full flex flex-col items-center">
+                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-5 border border-primary/20 shadow-inner">
+                        <FaSignInAlt className="text-primary text-2xl ml-1" />
+                    </div>
+                    <h1 className="text-center text-3xl font-extrabold text-foreground tracking-tight mb-2">Welcome Back</h1>
+                    <p className="text-center text-sm text-muted-foreground">Sign in to continue to ChatVerse</p>
                 </div>
-                <div className="w-full mb-7">
-                    <input type="email" name="email" value={userData.email} onChange={handleChangeUserData} className="border border-green-200 w-full p-2 rounded-md bg-[#01aa851d] text-[#004939f3] mb-3 font-medium outline-none placeholder:text-[#00493958]" placeholder="Email" />
-                    <input type="password" name="password" value={userData.password} onChange={handleChangeUserData} className="border border-green-200 w-full p-2 rounded-md bg-[#01aa851d] text-[#004939f3] mb-3 font-medium outline-none placeholder:text-[#00493958]" placeholder="Password" />
+                
+                <div className="w-full mb-8 space-y-4">
+                    <div className="relative">
+                        <input type="email" name="email" value={userData.email} onChange={handleChangeUserData} className="w-full p-4 rounded-xl bg-background border border-border text-foreground font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-muted-foreground/70 shadow-sm" placeholder="Email Address" />
+                    </div>
+                    <div className="relative">
+                        <input type="password" name="password" value={userData.password} onChange={handleChangeUserData} className="w-full p-4 rounded-xl bg-background border border-border text-foreground font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-muted-foreground/70 shadow-sm" placeholder="Password" />
+                    </div>
                 </div>
-                <div className="w-full">
-                    <button disabled={isLoading} onClick={handleAuth} className="bg-[#01aa85] text-white font-bold w-full p-2 rounded-md flex items-center gap-2 justify-center">
+
+                <div className="w-full mb-6">
+                    <button disabled={isLoading} onClick={handleAuth} className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg w-full py-4 rounded-xl flex items-center gap-2 justify-center shadow-[0_4px_14px_0_rgba(1,170,133,0.39)] hover:shadow-[0_6px_20px_rgba(1,170,133,0.23)] hover:-translate-y-0.5 transition-all outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:shadow-none">
                         {isLoading ? (
-                            <>
-                                <>Loggin in....</>
-                            </>
+                            <>Logging in...</>
                         ) : (
-                            <>
-                                Login <FaSignInAlt />
-                            </>
+                            <>Sign In</>
                         )}
                     </button>
                 </div>
-                <div className="mt-5 text-center text-gray-400 text-sm">
-                    <button onClick={() => setIsLogin(!isLogin)} >Don't have an account yet? Sign Up</button>
+
+                <div className="mt-2 text-center text-muted-foreground text-sm">
+                    <button onClick={() => setIsLogin(!isLogin)} className="hover:text-primary transition-colors font-medium">Don't have an account yet? <span className="text-primary font-bold">Sign Up</span></button>
                 </div>
             </div>
         </section>

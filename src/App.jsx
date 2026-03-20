@@ -7,6 +7,7 @@ import Navlinks from "./components/Navlinks";
 import Chatbox from "./components/Chatbox";
 import Chatlist from "./components/Chatlist";
 import AIChatbot from "./components/AIChatbot";
+import SplashScreen from "./components/SplashScreen";
 import { auth, db, initializeAIBot } from "./firebase/firebase.js";
 import logo from "./assets/logo.png";
 
@@ -14,6 +15,7 @@ const App = () => {
     const [isLogin, setIsLogin] = useState(false);
     const [user, setUser] = useState(null);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [showSplash, setShowSplash] = useState(true);
 
     useEffect(() => {
         const currentUser = auth.currentUser;
@@ -33,6 +35,10 @@ const App = () => {
 
         return () => unsubsribe();
     }, []);
+
+    if (showSplash) {
+        return <SplashScreen onFinish={() => setShowSplash(false)} />;
+    }
 
     return (
         <div>
@@ -60,17 +66,17 @@ const App = () => {
                             <Chatbox selectedUser={selectedUser} />
                         )
                     ) : (
-                        <section className='h-[100vh] w-[100%] bg-[#e5f6f3] '>
+                        <section className='h-[100vh] w-[100%] bg-background text-foreground '>
                             <div className='flex flex-col justify-center items-center h-[100vh] '>
                                 <img src={logo} alt="ChatVerse Logo" width={100} className="mb-5" />
-                                <h1 className="text-[30px] font-bold text-teal-700 mt-5">Welcome to ChatVerse</h1>
-                                <p className="text-gray-500">Select a chat to get started or chat with our AI assistant</p>
+                                <h1 className="text-[30px] font-bold text-primary mt-5">Welcome to ChatVerse</h1>
+                                <p className="text-muted-foreground">Select a chat to get started or chat with our AI assistant</p>
                             </div>
                         </section>
                     )}
                 </div>
             ) : (
-                <div className=" ">
+                <div className="bg-background text-foreground h-screen">
                     {isLogin ? ( <Login isLogin={isLogin} setIsLogin={setIsLogin} /> ) : ( <Register isLogin={isLogin} setIsLogin={setIsLogin} />) };
                 </div>
             )}

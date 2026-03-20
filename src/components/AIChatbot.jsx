@@ -15,7 +15,7 @@ const AIChatbot = () => {
   const scrollRef = useRef(null);
   const unsubscribeRef = useRef(null);
 
-  // Generate or get conversation ID on component mount
+  // Generate or get conversation ID on component mount 
   useEffect(() => {
     // Use today's date as conversation ID so all messages in a day are grouped
     const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
@@ -114,10 +114,38 @@ const AIChatbot = () => {
     }
   };
 
+  // Helper to format AI markdown responses (boldness, lists, newlines)
+  const formatMessage = (text) => {
+    if (!text) return "";
+    return text.split('\n').map((line, idx) => {
+      let isList = false;
+      let content = line;
+      if (content.trim().startsWith('* ')) {
+        isList = true;
+        content = content.trim().substring(2);
+      }
+      
+      const parts = content.split(/(\*\*.*?\*\*)/g);
+      const formattedLine = parts.map((part, i) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          return <strong key={i} className="font-bold font-semibold">{part.slice(2, -2)}</strong>;
+        }
+        return <span key={i}>{part}</span>;
+      });
+
+      return (
+        <div key={idx} className={`${isList ? 'ml-4 flex gap-2 mt-1.5' : 'mt-1.5'} leading-relaxed`}>
+          {isList && <span className="font-bold inline-block">•</span>}
+          <div className="inline">{formattedLine}</div>
+        </div>
+      );
+    });
+  };
+
   return (
     <section className='flex flex-col items-start justify-start h-screen w-[100%] background-image'>
       {/* Chat Header */}
-      <header className='border-b border-[#9090902c] w-[100%] h-[70px] md:h-fit p-4 bg-white '>
+      <header className='border-b border-border w-[100%] h-[70px] md:h-fit p-4 bg-card '>
         <main className='flex items-center gap-3 '>
           <span>
             <div className="w-11 h-11 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center">
@@ -125,23 +153,23 @@ const AIChatbot = () => {
             </div>
           </span>
           <span>
-            <h3 className="font-semibold text-[#2A3D39] text-lg">ChatVerse AI</h3>
-            <p className="font-light text-[#2A3D39] text-sm">@chatverse-ai</p>
+            <h3 className="font-semibold text-foreground text-lg">ChatVerse AI</h3>
+            <p className="font-light text-muted-foreground text-sm">@chatverse-ai</p>
           </span>
         </main>
       </header>
 
       {/* Chat Messages Area */}
-      <main className="custom-scrollbar relative h-[100vh] w-[100%] flex flex-col justify-between ">
+      <main className="relative h-[100vh] w-[100%] flex flex-col justify-between ">
         <section className="px-3 pt-5 pb-20 lg:pb-10 ">
-          <div ref={scrollRef} className="overflow-auto h-[80vh]">
+          <div ref={scrollRef} className="overflow-y-auto overflow-x-hidden h-[80vh]">
             {/* Welcome Message */}
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full text-center py-10">
                 <div className="text-6xl mb-4">🤖</div>
-                <h2 className="text-2xl font-bold text-[#2A3D39] mb-2">Welcome to ChatVerse AI</h2>
-                <p className="text-gray-500 mb-4">Ask me anything and I'll help you out!</p>
-                <div className="text-sm text-gray-400">
+                <h2 className="text-2xl font-bold text-foreground mb-2">Welcome to ChatVerse AI</h2>
+                <p className="text-muted-foreground mb-4">Ask me anything and I'll help you out!</p>
+                <div className="text-sm text-muted-foreground">
                   <p>✨ Ask questions</p>
                   <p>💡 Get suggestions</p>
                   <p>📚 Learn something new</p>
@@ -159,27 +187,27 @@ const AIChatbot = () => {
                   // User Message
                   <span className="flex gap-3 h-auto ms-10 lg:me-7 me-2.5">
                     <div>
-                      <div className="flex items-center bg-[#01aa85] text-white justify-center p-4 rounded-lg shadow-sm break-words">
+                      <div className="flex items-center bg-primary text-primary-foreground justify-center px-4 py-3 rounded-2xl rounded-tr-sm shadow-sm break-words max-w-[85vw] md:max-w-[60vw]">
                         <h4 className="text-sm md:text-base">{msg?.text}</h4>
                       </div>
-                      <p className="text-gray-400 text-xs mt-1.5 text-right">
+                      <p className="text-muted-foreground text-xs mt-1.5 text-right">
                         {msg?.timestamp ? formatTimestamp(msg?.timestamp) : ""}
                       </p>
                     </div>
                   </span>
                 ) : (
                   // AI Message
-                  <span className="flex gap-3 w-[40%] h-auto lg:ms-6 ms-2">
-                    <div className="w-11 h-11 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center flex-shrink-0">
+                  <span className="flex gap-2 md:gap-3 lg:ms-6 ms-2">
+                    <div className="hidden md:flex w-11 h-11 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 items-center justify-center flex-shrink-0 mt-1">
                       <span className="text-white font-bold text-lg">🤖</span>
                     </div>
-                    <div>
-                      <div className="flex items-start bg-white justify-start p-4 rounded-lg shadow-sm break-words">
-                        <p className="text-sm md:text-base text-[#2A3D39]">
-                          {msg?.text}
-                        </p>
+                    <div className="flex-1 max-w-[90vw] md:max-w-[75vw] lg:max-w-[850px] overflow-hidden">
+                      <div className="flex items-start bg-card justify-start px-5 py-3.5 rounded-2xl rounded-tl-sm shadow-sm break-words">
+                        <div className="text-sm md:text-base text-card-foreground w-full overflow-hidden">
+                          {formatMessage(msg?.text)}
+                        </div>
                       </div>
-                      <p className="text-gray-400 text-xs mt-1.5">
+                      <p className="text-muted-foreground text-xs mt-1.5">
                         {msg?.timestamp ? formatTimestamp(msg?.timestamp) : ""}
                       </p>
                     </div>
@@ -188,20 +216,24 @@ const AIChatbot = () => {
               </div>
             ))}
 
-            {/* Loading Indicator */}
+            {/* AI Typing Indicator */}
             {isLoading && (
-              <div className="flex gap-3 w-full lg:ms-6 ms-2 mb-5">
-                <img
-                  src={default1}
-                  className="h-11 w-11 object-cover rounded-full"
-                  alt="AI Bot"
-                />
-                <div className="flex items-center gap-2 bg-white p-4 rounded-lg shadow-sm">
-                  <RiLoader4Line className="animate-spin text-[#01aa85]" size={20} />
-                  <span className="text-sm text-gray-600">AI is thinking...</span>
-                </div>
+              <div className="flex flex-col items-start w-full mb-5">
+                <span className="flex gap-2 md:gap-3 lg:ms-6 ms-2">
+                  <div className="hidden md:flex w-11 h-11 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 items-center justify-center flex-shrink-0 mt-1">
+                    <span className="text-white font-bold text-lg">🤖</span>
+                  </div>
+                  <div className="flex items-center gap-3 bg-card px-5 py-4 rounded-2xl rounded-tl-sm shadow-sm w-fit">
+                    <span className="flex gap-1.5 items-center">
+                      <div className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-2 h-2 rounded-full bg-primary/80 animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    </span>
+                  </div>
+                </span>
               </div>
             )}
+
           </div>
         </section>
 
@@ -209,25 +241,25 @@ const AIChatbot = () => {
         <div className="sticky lg:bottom-0 bottom-[60px] p-3 h-fit w-[100%] ">
           <form
             onSubmit={handleSendMessage}
-            className="flex items-center bg-white h-[45px] w-[100%] px-2 rounded-lg relative shadow-lg "
+            className="flex items-center bg-card h-[45px] w-[100%] px-2 rounded-lg relative shadow-lg "
           >
             <input
               value={messageText}
               onChange={(e) => setMessageText(e.target.value)}
               disabled={isLoading || !conversationId}
               type="text"
-              className="h-full text-[#2A3D39] outline-none text-[16px] pl-3 pr-[40px] rounded-lg w-[100%] disabled:bg-gray-100"
+              className="h-full text-foreground outline-none text-[16px] pl-3 pr-[40px] rounded-lg w-[100%] bg-transparent disabled:opacity-50"
               placeholder={isLoading ? "AI is thinking..." : "Ask me anything..."}
             />
             <button
               type="submit"
               disabled={isLoading || !conversationId}
-              className="flex items-center justify-center absolute right-3 p-2 rounded-md bg-[#D9f2ed] hover:bg-[#c8eae3] disabled:opacity-50"
+              className="flex items-center justify-center absolute right-3 p-2 rounded-md bg-muted hover:brightness-95 disabled:opacity-50"
             >
               {isLoading ? (
-                <RiLoader4Line className="animate-spin" color="#01AA85" />
+                <RiLoader4Line className="animate-spin text-primary" />
               ) : (
-                <RiSendPlaneFill color="01AA85" />
+                <RiSendPlaneFill className="text-primary" />
               )}
             </button>
           </form>

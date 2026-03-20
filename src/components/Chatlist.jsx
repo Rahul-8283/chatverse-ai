@@ -63,17 +63,17 @@ const Chatlist = ({ setSelectedUser }) => {
   }
 
   return (
-    <section className="relative hidden lg:flex flex-col item-start justify-start bg-white h-[100vh] w-[100%] md:w-[580px] ">
-      <header className="flex items-center justify-between w-[100%] lg:border-b border-b-1 border-[#898989b9] p-4 sticky md:static top-0 z-[100] border-r border-[#9090902c]">
+    <section className="relative hidden lg:flex flex-col item-start justify-start bg-card border-r border-border h-[100vh] w-[100%] md:w-[580px] ">
+      <header className="flex items-center justify-between w-[100%] lg:border-b border-border p-4 sticky md:static top-0 z-[100] border-r">
         <main className="flex items-center gap-3">
           <img src={user?.image || default1} className="w-[44px] h-[44px] object-cover rounded-full" alt="temp" />
           <span>
-            <h3 className="p-0 font-semibold text-[#2A3D39] md:text-[17px]">{user?.fullName || "ChatVerse User"}</h3>
-            <p className="p-0 font-light text-[#2A3D39] text-[15px]">@{user?.username || "chatverse"}</p>
+            <h3 className="p-0 font-semibold text-foreground md:text-[17px]">{user?.fullName || "ChatVerse User"}</h3>
+            <p className="p-0 font-light text-muted-foreground text-[15px]">@{user?.username || "chatverse"}</p>
           </span>
         </main>
-        <button className="bg-[#D9F2ED] w-[35px] h-[35px] p-2 flex items-center justify-center rounded-lg">
-          <RiMore2Fill color="#01AA85" className="w-[28px] h-[28px] cursor-pointer" />
+        <button className="bg-muted w-[35px] h-[35px] flex items-center justify-center rounded-lg">
+          <RiMore2Fill className="w-[28px] h-[28px] cursor-pointer text-primary" />
         </button>
       </header>
 
@@ -89,17 +89,17 @@ const Chatlist = ({ setSelectedUser }) => {
         {aiBot && (
           <button
             onClick={() => setSelectedUser(aiBot)}
-            className="flex items-start justify-between w-[100%] border-b border-[#9090902c] px-5 py-3 hover:bg-[#f9f9f9] transition"
+            className="flex items-start justify-between w-[100%] border-b border-border px-5 py-3 hover:bg-muted transition"
           >
             <div className="flex items-start gap-3">
               <div className="w-[40px] h-[40px] rounded-full bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center flex-shrink-0">
                 <span className="text-white font-bold text-xl">🤖</span>
               </div>
               <span>
-                <h2 className="p-0 font-semibold text-[#2A3d39] text-left text-[17px]">
+                <h2 className="p-0 font-semibold text-foreground text-left text-[17px]">
                   ChatVerse AI
                 </h2>
-                <p className="p-0 font-light text-[#2A3d39] text-left text-[14px]">
+                <p className="p-0 font-light text-muted-foreground text-left text-[14px]">
                   @{aiBot?.username || "chatverse-ai"}
                 </p>
               </span>
@@ -109,7 +109,7 @@ const Chatlist = ({ setSelectedUser }) => {
 
         {/* Regular User Chats */}
         {sortedChats?.map((chat) => (
-          <button key={chat?.id} className="flex items-start justify-between w-[100%] border-b border-[#9090902c] px-5 py-3 hover:bg-[#f9f9f9] transition">
+          <button key={chat?.id} className="flex items-start justify-between w-[100%] border-b border-border px-5 py-3 hover:bg-muted transition">
             {chat?.users
               ?.filter((user) => user?.email !== auth?.currentUser?.email)
               ?.map((user) => (
@@ -117,11 +117,11 @@ const Chatlist = ({ setSelectedUser }) => {
                   <div className="flex items-start gap-3" onClick={() => setSelectedUser(user)} >
                     <img src={user?.image || default1} className="h-[40px] w-[40px] rounded-full object-cover" alt="" />
                     <span>
-                      <h2 className="p-0 font-semibold text-[#2A3d39] text-left text-[17px]">{user?.fullName || "ChatFrik User"}</h2>
-                      <p className="p-0 font-light text-[#2A3d39] text-left text-[14px]">{chat?.lastMessage}</p>
+                      <h2 className="p-0 font-semibold text-foreground text-left text-[17px]">{user?.fullName || "ChatVerse User"}</h2>
+                      <p className="p-0 font-light text-muted-foreground text-left text-[14px]">{chat?.lastMessage}</p>
                     </span>
                   </div>
-                  <p className="p-0 font-regular text-gray-400 text-left text-[11px]">{formatTimestamp(chat?.lastMessageTimestamp)}</p>
+                  <p className="p-0 font-regular text-muted-foreground text-left text-[11px]">{formatTimestamp(chat?.lastMessageTimestamp)}</p>
                 </>
               ))}
           </button>
