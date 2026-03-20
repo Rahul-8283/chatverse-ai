@@ -162,7 +162,7 @@ const AIChatbot = () => {
       {/* Chat Messages Area */}
       <main className="relative h-[100vh] w-[100%] flex flex-col justify-between ">
         <section className="px-3 pt-5 pb-20 lg:pb-10 ">
-          <div ref={scrollRef} className="overflow-auto h-[80vh]">
+          <div ref={scrollRef} className="overflow-y-auto overflow-x-hidden h-[80vh]">
             {/* Welcome Message */}
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full text-center py-10">
@@ -197,13 +197,13 @@ const AIChatbot = () => {
                   </span>
                 ) : (
                   // AI Message
-                  <span className="flex gap-3 w-full h-auto lg:ms-6 ms-2">
-                    <div className="w-11 h-11 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center flex-shrink-0 mt-1">
+                  <span className="flex gap-2 md:gap-3 lg:ms-6 ms-2">
+                    <div className="hidden md:flex w-11 h-11 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 items-center justify-center flex-shrink-0 mt-1">
                       <span className="text-white font-bold text-lg">🤖</span>
                     </div>
-                    <div className="flex-1 max-w-[85vw] md:max-w-[70vw]">
-                      <div className="flex items-start bg-card justify-start px-5 py-3 rounded-2xl rounded-tl-sm shadow-sm break-words overflow-hidden">
-                        <div className="text-sm md:text-base text-card-foreground w-full">
+                    <div className="flex-1 max-w-[90vw] md:max-w-[75vw] lg:max-w-[850px] overflow-hidden">
+                      <div className="flex items-start bg-card justify-start px-5 py-3.5 rounded-2xl rounded-tl-sm shadow-sm break-words">
+                        <div className="text-sm md:text-base text-card-foreground w-full overflow-hidden">
                           {formatMessage(msg?.text)}
                         </div>
                       </div>
@@ -219,8 +219,8 @@ const AIChatbot = () => {
             {/* AI Typing Indicator */}
             {isLoading && (
               <div className="flex flex-col items-start w-full mb-5">
-                <span className="flex gap-3 w-full h-auto lg:ms-6 ms-2">
-                  <div className="w-11 h-11 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center flex-shrink-0 mt-1">
+                <span className="flex gap-2 md:gap-3 lg:ms-6 ms-2">
+                  <div className="hidden md:flex w-11 h-11 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 items-center justify-center flex-shrink-0 mt-1">
                     <span className="text-white font-bold text-lg">🤖</span>
                   </div>
                   <div className="flex items-center gap-3 bg-card px-5 py-4 rounded-2xl rounded-tl-sm shadow-sm w-fit">
