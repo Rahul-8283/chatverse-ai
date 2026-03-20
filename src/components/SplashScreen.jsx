@@ -25,6 +25,16 @@ const SplashScreen = ({ onFinish }) => {
     <div 
       className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#0d2420] transition-opacity duration-300 ${isFading ? 'opacity-0' : 'opacity-100'}`}
     >
+      {/* Loading Bar at Top */}
+      <div className="absolute top-0 left-0 w-full h-1.5 bg-[#0a1f1a]">
+        <div 
+          className="h-full bg-[#25d366]" 
+          style={{
+            animation: 'fillBar 2.5s ease-in-out forwards'
+          }}
+        ></div>
+      </div>
+
       <div className="relative flex flex-col items-center justify-center flex-1 w-full">
         {/* Logo/Icon container with pulsing glow */}
         <div className="relative mb-6">
@@ -44,16 +54,6 @@ const SplashScreen = ({ onFinish }) => {
         <p className="text-gray-400 text-sm tracking-wide font-medium">
           Chat smarter, connect better
         </p>
-      </div>
-
-      {/* Loading Bar at Bottom */}
-      <div className="w-full h-1.5 bg-[#0a1f1a]">
-        <div 
-          className="h-full bg-[#25d366]" 
-          style={{
-            animation: 'fillBar 2.5s ease-in-out forwards'
-          }}
-        ></div>
       </div>
 
       <style>{`
