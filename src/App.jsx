@@ -7,6 +7,7 @@ import Navlinks from "./components/Navlinks";
 import Chatbox from "./components/Chatbox";
 import Chatlist from "./components/Chatlist";
 import AIChatbot from "./components/AIChatbot";
+import SplashScreen from "./components/SplashScreen";
 import { auth, db, initializeAIBot } from "./firebase/firebase.js";
 import logo from "./assets/logo.png";
 
@@ -14,6 +15,7 @@ const App = () => {
     const [isLogin, setIsLogin] = useState(false);
     const [user, setUser] = useState(null);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [showSplash, setShowSplash] = useState(true);
 
     useEffect(() => {
         const currentUser = auth.currentUser;
@@ -33,6 +35,10 @@ const App = () => {
 
         return () => unsubsribe();
     }, []);
+
+    if (showSplash) {
+        return <SplashScreen onFinish={() => setShowSplash(false)} />;
+    }
 
     return (
         <div>
