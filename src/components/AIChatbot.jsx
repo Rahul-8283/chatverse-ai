@@ -117,7 +117,7 @@ const AIChatbot = () => {
   return (
     <section className='flex flex-col items-start justify-start h-screen w-[100%] background-image'>
       {/* Chat Header */}
-      <header className='border-b border-[#9090902c] w-[100%] h-[70px] md:h-fit p-4 bg-white '>
+      <header className='border-b border-border w-[100%] h-[70px] md:h-fit p-4 bg-card '>
         <main className='flex items-center gap-3 '>
           <span>
             <div className="w-11 h-11 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center">
@@ -125,8 +125,8 @@ const AIChatbot = () => {
             </div>
           </span>
           <span>
-            <h3 className="font-semibold text-[#2A3D39] text-lg">ChatVerse AI</h3>
-            <p className="font-light text-[#2A3D39] text-sm">@chatverse-ai</p>
+            <h3 className="font-semibold text-foreground text-lg">ChatVerse AI</h3>
+            <p className="font-light text-muted-foreground text-sm">@chatverse-ai</p>
           </span>
         </main>
       </header>
@@ -139,9 +139,9 @@ const AIChatbot = () => {
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full text-center py-10">
                 <div className="text-6xl mb-4">🤖</div>
-                <h2 className="text-2xl font-bold text-[#2A3D39] mb-2">Welcome to ChatVerse AI</h2>
-                <p className="text-gray-500 mb-4">Ask me anything and I'll help you out!</p>
-                <div className="text-sm text-gray-400">
+                <h2 className="text-2xl font-bold text-foreground mb-2">Welcome to ChatVerse AI</h2>
+                <p className="text-muted-foreground mb-4">Ask me anything and I'll help you out!</p>
+                <div className="text-sm text-muted-foreground">
                   <p>✨ Ask questions</p>
                   <p>💡 Get suggestions</p>
                   <p>📚 Learn something new</p>
@@ -159,10 +159,10 @@ const AIChatbot = () => {
                   // User Message
                   <span className="flex gap-3 h-auto ms-10 lg:me-7 me-2.5">
                     <div>
-                      <div className="flex items-center bg-[#01aa85] text-white justify-center p-4 rounded-lg shadow-sm break-words">
+                      <div className="flex items-center bg-primary text-primary-foreground justify-center p-4 rounded-lg shadow-sm break-words">
                         <h4 className="text-sm md:text-base">{msg?.text}</h4>
                       </div>
-                      <p className="text-gray-400 text-xs mt-1.5 text-right">
+                      <p className="text-muted-foreground text-xs mt-1.5 text-right">
                         {msg?.timestamp ? formatTimestamp(msg?.timestamp) : ""}
                       </p>
                     </div>
@@ -174,12 +174,12 @@ const AIChatbot = () => {
                       <span className="text-white font-bold text-lg">🤖</span>
                     </div>
                     <div>
-                      <div className="flex items-start bg-white justify-start p-4 rounded-lg shadow-sm break-words">
-                        <p className="text-sm md:text-base text-[#2A3D39]">
+                      <div className="flex items-start bg-card justify-start p-4 rounded-lg shadow-sm break-words">
+                        <p className="text-sm md:text-base text-card-foreground">
                           {msg?.text}
                         </p>
                       </div>
-                      <p className="text-gray-400 text-xs mt-1.5">
+                      <p className="text-muted-foreground text-xs mt-1.5">
                         {msg?.timestamp ? formatTimestamp(msg?.timestamp) : ""}
                       </p>
                     </div>
@@ -196,9 +196,9 @@ const AIChatbot = () => {
                   className="h-11 w-11 object-cover rounded-full"
                   alt="AI Bot"
                 />
-                <div className="flex items-center gap-2 bg-white p-4 rounded-lg shadow-sm">
-                  <RiLoader4Line className="animate-spin text-[#01aa85]" size={20} />
-                  <span className="text-sm text-gray-600">AI is thinking...</span>
+                <div className="flex items-center gap-2 bg-card p-4 rounded-lg shadow-sm">
+                  <RiLoader4Line className="animate-spin text-primary" size={20} />
+                  <span className="text-sm text-muted-foreground">AI is thinking...</span>
                 </div>
               </div>
             )}
@@ -209,25 +209,25 @@ const AIChatbot = () => {
         <div className="sticky lg:bottom-0 bottom-[60px] p-3 h-fit w-[100%] ">
           <form
             onSubmit={handleSendMessage}
-            className="flex items-center bg-white h-[45px] w-[100%] px-2 rounded-lg relative shadow-lg "
+            className="flex items-center bg-card h-[45px] w-[100%] px-2 rounded-lg relative shadow-lg "
           >
             <input
               value={messageText}
               onChange={(e) => setMessageText(e.target.value)}
               disabled={isLoading || !conversationId}
               type="text"
-              className="h-full text-[#2A3D39] outline-none text-[16px] pl-3 pr-[40px] rounded-lg w-[100%] disabled:bg-gray-100"
+              className="h-full text-foreground outline-none text-[16px] pl-3 pr-[40px] rounded-lg w-[100%] bg-transparent disabled:opacity-50"
               placeholder={isLoading ? "AI is thinking..." : "Ask me anything..."}
             />
             <button
               type="submit"
               disabled={isLoading || !conversationId}
-              className="flex items-center justify-center absolute right-3 p-2 rounded-md bg-[#D9f2ed] hover:bg-[#c8eae3] disabled:opacity-50"
+              className="flex items-center justify-center absolute right-3 p-2 rounded-md bg-muted hover:brightness-95 disabled:opacity-50"
             >
               {isLoading ? (
-                <RiLoader4Line className="animate-spin" color="#01AA85" />
+                <RiLoader4Line className="animate-spin text-primary" />
               ) : (
-                <RiSendPlaneFill color="01AA85" />
+                <RiSendPlaneFill className="text-primary" />
               )}
             </button>
           </form>

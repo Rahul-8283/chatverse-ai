@@ -1,10 +1,12 @@
 import React from 'react'
 import logo from '../assets/logo.png'
-import { RiArrowDownSFill, RiBardLine, RiChatAiFill, RiChatAiLine, RiFile4Line, RiFolderUserLine, RiNotificationLine, RiShutDownLine } from "react-icons/ri";
+import { RiArrowDownSFill, RiMoonLine, RiSunLine, RiChatAiFill, RiChatAiLine, RiFile4Line, RiFolderUserLine, RiNotificationLine, RiShutDownLine } from "react-icons/ri";
 import { auth } from '../firebase/firebase';
 import { signOut } from 'firebase/auth';
+import { useTheme } from '../contexts/ThemeContext.jsx';
 
 const Navlinks = () => {
+  const { theme, toggleTheme } = useTheme();
 
   const handleLogout = async () => {
     try {
@@ -16,7 +18,7 @@ const Navlinks = () => {
   }
 
   return (
-    <section className="sticky lg:static top-0 flex items-center lg:items-start lg:justify-start h-[7vh] lg:h-[100vh] w-[100%] lg:w-[132px] py-8 lg:py-0 bg-[#01AA85] ">
+    <section className="sticky lg:static top-0 flex items-center lg:items-start lg:justify-start h-[7vh] lg:h-[100vh] w-[100%] lg:w-[132px] py-8 lg:py-0 bg-primary text-primary-foreground transition-colors duration-300">
       <main className="flex lg:flex-col items-center lg:gap-10 justify-between lg:px-0 w-[100%]  ">
         <div className="flex items-start justify-center lg:border-b border-b-1 border-[#ffffffb9] lg:w-[100%] p-4">
           <span className="flex items-center justify-center ">
@@ -46,8 +48,8 @@ const Navlinks = () => {
             </button>
           </li>
           <li className="">
-            <button className="lg:text-[28px] text-[22px] cursor-pointer">
-              <RiBardLine color="#fff" />
+            <button onClick={toggleTheme} className="lg:text-[28px] text-[22px] cursor-pointer hover:text-[#25d366] transition-colors">
+              {theme === 'dark' ? <RiSunLine color="#fff" /> : <RiMoonLine color="#fff" />}
             </button>
           </li>
           <li className="">

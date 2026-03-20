@@ -58,14 +58,14 @@ const Chatbox = ({ selectedUser }) => {
     <>
       {selectedUser ? (
         <section className='flex flex-col items-start justify-start h-screen w-[100%] background-image'>
-          <header className='border-b border-[#9090902c] w-[100%] h-[70px] md:h-fit p-4 bg-white '>
+          <header className='border-b border-border w-[100%] h-[70px] md:h-fit p-4 bg-card '>
             <main className='flex items-center gap-3 '>
               <span>
                 <img src={selectedUser?.image || default1} className="w-11 h-11 object-cover rounded-full " alt="Chat name" />
               </span>
               <span>
-                <h3 className="font-semibold text-[#2A3D39] text-lg">{selectedUser?.fullName || "ChatVerse User"}</h3>
-                <p className="font-light text-[#2A3D39] text-sm">@{selectedUser?.username || "chatverse"}</p>
+                <h3 className="font-semibold text-foreground text-lg">{selectedUser?.fullName || "ChatVerse User"}</h3>
+                <p className="font-light text-muted-foreground text-sm">@{selectedUser?.username || "chatverse"}</p>
               </span>
             </main>
           </header>
@@ -80,10 +80,10 @@ const Chatbox = ({ selectedUser }) => {
                       <div className="flex flex-col items-end w-full">
                         <span className="flex gap-3 h-auto ms-10 lg:me-7 me-2.5 mb-5">
                           <div>
-                            <div className="flex items-center bg-white justify-center p-4 rounded-lg shadow-sm">
+                            <div className="flex items-center bg-card text-card-foreground justify-center p-4 rounded-lg shadow-sm">
                               <h4>{msg?.text}</h4>
                             </div>
-                            <p className="text-gray-400 text-sx mt-1.5 text-right">{formatTimestamp(msg?.timestamp)}</p>
+                            <p className="text-muted-foreground text-sx mt-1.5 text-right">{formatTimestamp(msg?.timestamp)}</p>
                           </div>
                         </span>
                       </div>
@@ -92,10 +92,10 @@ const Chatbox = ({ selectedUser }) => {
                         <span className="flex gap-3 w-[40%] h-auto lg:ms-6 ms-2 mb-5">
                           <img src={default1} className="h-11 w-11 object-cover rounded-full " alt="" />
                           <div>
-                            <div className="flex items-center bg-white justify-center p-4 rounded-lg shadow-sm">
+                            <div className="flex items-center bg-card text-card-foreground justify-center p-4 rounded-lg shadow-sm">
                               <h4>{msg?.text}</h4>
                             </div>
-                            <p className="text-gray-400 text-sx mt-1.5 text-right">{formatTimestamp(msg?.timestamp)}</p>
+                            <p className="text-muted-foreground text-sx mt-1.5 text-right">{formatTimestamp(msg?.timestamp)}</p>
                           </div>
                         </span>
                       </div>
@@ -107,21 +107,21 @@ const Chatbox = ({ selectedUser }) => {
             </section>
 
             <div className="sticky lg:bottom-0 bottom-[60px] p-3 h-fit w-[100%] ">
-              <form onSubmit={handleSendMessage} className="flex items-center bg-white h-[45px] w-[100%] px-2 rounded-lg relative shadow-lg ">
-                <input value={messageText} onChange={(e) => sendMessageText(e.target.value)} type="text" className="h-full text-[#2A3D39] outline-none text-[16px] pl-3 pr-[40px] rounded-lg w-[100%]" name="" id="" placeholder="Write your message..." />
-                <button type="submit" action="submit" className="flex items-center justify-center absolute right-3 p-2 rounded-md bg-[#D9f2ed] hover:bg-[#c8eae3] ">
-                  <RiSendPlaneFill color="01AA85" />
+              <form onSubmit={handleSendMessage} className="flex items-center bg-card h-[45px] w-[100%] px-2 rounded-lg relative shadow-lg ">
+                <input value={messageText} onChange={(e) => sendMessageText(e.target.value)} type="text" className="h-full text-foreground outline-none text-[16px] pl-3 pr-[40px] rounded-lg w-[100%] bg-transparent" name="" id="" placeholder="Write your message..." />
+                <button type="submit" action="submit" className="flex items-center justify-center absolute right-3 p-2 rounded-md bg-muted hover:brightness-95 text-primary ">
+                  <RiSendPlaneFill className="text-primary" />
                 </button>
               </form>
             </div>
           </main>
         </section>
       ) : (
-        <section className='h-[100vh] w-[100%] bg-[#e5f6f3] '>
+        <section className='h-[100vh] w-[100%] bg-background text-foreground '>
           <div className='flex flex-col justify-center items-center h-[100vh] '>
             <img src={logo} alt="" width={100} />
-            <h1 className="text-[30px] font-bold text-teal-700 mt-5">Welcome to ChatVerse</h1>
-            <p className="text-gray-500">Connect and chat with friends easily, securely, fast and free</p>
+            <h1 className="text-[30px] font-bold text-primary mt-5">Welcome to ChatVerse</h1>
+            <p className="text-muted-foreground">Connect and chat with friends easily, securely, fast and free</p>
           </div>
         </section>
       )}

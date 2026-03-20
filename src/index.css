@@ -1,13 +1,54 @@
 @import "tailwindcss";
 /* @import url("https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap"); */
 
+@theme {
+  --color-background: var(--bg);
+  --color-foreground: var(--fg);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-fg);
+  --color-border: var(--border);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-fg);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-fg);
+}
+
+@layer base {
+  :root {
+    --bg: #e5f6f3;
+    --fg: #0a1f1a;
+    --primary: #01AA85;
+    --primary-fg: #ffffff;
+    --border: #c4ece3;
+    --card: #ffffff;
+    --card-fg: #0a1f1a;
+    --muted: #f1f5f9;
+    --muted-fg: #64748b;
+  }
+
+  .dark {
+    --bg: #0d2420;
+    --fg: #f8fafc;
+    --primary: #25d366;
+    --primary-fg: #000000;
+    --border: #1f423a;
+    --card: #15332c;
+    --card-fg: #f8fafc;
+    --muted: #1e453c;
+    --muted-fg: #94a3b8;
+  }
+}
+
 body {
     margin: 0;
     padding: 0;
     font-family: "jost";
     height: 100%;
-    background-color: #01aa8529;
+    /* Override hardcoded background to use theme variable */
+    background-color: var(--bg);
+    color: var(--fg);
     overflow: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .background-image {
