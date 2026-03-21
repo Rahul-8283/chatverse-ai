@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import { RiSendPlaneFill, RiLoader4Line } from "react-icons/ri";
-import { chatWithAI } from '../utils/geminiAPI';
+import { FiImage, FiMic, FiX } from "react-icons/fi";
+import api from '../config/axiosConfig';
 import { saveAIMessage, listenForAIMessages } from '../firebase/firebase';
 import formatTimestamp from '../utils/formatTimestamp';
 import { auth } from '../firebase/firebase';
-import default1 from "../assets/default1.jpg";
+import { PERSONAS, WELCOME_MSGS, getBase64, formatMessage, renderUserContent } from '../utils/chatUtils.jsx';
 
 const AIChatbot = () => {
+
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -15,25 +17,31 @@ const AIChatbot = () => {
   const scrollRef = useRef(null);
   const unsubscribeRef = useRef(null);
 
-  // Generate or get conversation ID on component mount 
-  useEffect(() => {
-    // Use today's date as conversation ID so all messages in a day are grouped
-    const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-    setConversationId(today);
-  }, []);
+  // New features' states
+  const [selectedPersona, setSelectedPersona] = useState("assistant");
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const fileInputRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
 
-  // Listen to Firestore messages when conversation ID is set
+  // Generate conversation ID based on date and persona
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    setConversationId(`${today}-${selectedPersona}`);
+  }, [selectedPersona]);
+
+  // Listen to Firestore messages
   useEffect(() => {
     if (!conversationId || !auth.currentUser) return;
 
-    // Listen for messages from Firestore
     unsubscribeRef.current = listenForAIMessages(
       auth.currentUser.uid,
       conversationId,
       setMessages
     );
 
-    // Cleanup listener on unmount
     return () => {
       if (unsubscribeRef.current) {
         unsubscribeRef.current();
@@ -41,14 +49,13 @@ const AIChatbot = () => {
     };
   }, [conversationId]);
 
-  // Auto-scroll to bottom when messages update
+  // Auto-scroll to bottom
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, imagePreview]);
 
-  // Sort messages by timestamp
   const sortedMessages = useMemo(() => {
     return [...messages].sort((a, b) => {
       const aTime = a?.timestamp?.seconds || 0;
@@ -57,25 +64,27 @@ const AIChatbot = () => {
     });
   }, [messages]);
 
+  const handlePersonaChange = (personaId) => {
+    setSelectedPersona(personaId);
+    setMessages([]); // Temporarily clear UI until firestore syncs
+    toast.success(`Switched to ${PERSONAS.find(p => p.id === personaId).name}`);
+  };
+
   const handleSendMessage = async (e) => {
-    e.preventDefault();
+    if(e) e.preventDefault();
 
     if (!messageText.trim()) {
       toast.error("Please type a message");
       return;
     }
 
-    if (!conversationId || !auth.currentUser) {
-      toast.error("Error: Cannot send message. Please refresh and try again.");
-      return;
-    }
+    if (!conversationId || !auth.currentUser) return;
 
     const userMessageText = messageText;
     setMessageText("");
     setIsLoading(true);
 
     try {
-      // Save user message to Firestore
       await saveAIMessage(
         auth.currentUser.uid,
         conversationId,
@@ -83,97 +92,205 @@ const AIChatbot = () => {
         "user"
       );
 
-      // Get AI response
-      const aiResponse = await chatWithAI(userMessageText);
+      const historyForAPI = sortedMessages.map(msg => {
+        let text = msg.text || "";
+        if (text.startsWith("[IMAGE]")) text = "[Image Uploaded]";
+        if (text.startsWith("[AUDIO]")) text = text.split("|").slice(1).join("|");
+        return {
+          role: msg.sender === "user" ? "user" : "model",
+          parts: [{ text }]
+        };
+      });
 
-      // Save AI message to Firestore
+      const res = await api.post("/api/chat", {
+        message: userMessageText,
+        history: historyForAPI,
+        persona: selectedPersona
+      });
+
       await saveAIMessage(
         auth.currentUser.uid,
         conversationId,
-        aiResponse,
+        res.data.reply,
         "ai"
       );
 
     } catch (error) {
       console.error("Error in chat:", error);
-      
-      // More specific error messages
-      const errorMsg = error?.message ? String(error.message) : String(error);
-      
-      if (errorMsg.includes("429") || errorMsg.includes("rate limit from server")) {
-        toast.error("⏱️ Server rate limit reached. Please wait 30 seconds.");
-      } else if (errorMsg.includes("API key")) {
-        toast.error("❌ Invalid Gemini API key. Check .env file.");
-      } else if (errorMsg.includes("permission") || errorMsg.includes("PERMISSION")) {
-        toast.error("❌ Permission denied. Check Firestore rules.");
-      } else {
-        toast.error(`Error: ${errorMsg}`);
-      }
+      toast.error("Failed to send message: " + (error?.response?.data?.detail || error.message));
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Helper to format AI markdown responses (boldness, lists, newlines)
-  const formatMessage = (text) => {
-    if (!text) return "";
-    return text.split('\n').map((line, idx) => {
-      let isList = false;
-      let content = line;
-      if (content.trim().startsWith('* ')) {
-        isList = true;
-        content = content.trim().substring(2);
-      }
-      
-      const parts = content.split(/(\*\*.*?\*\*)/g);
-      const formattedLine = parts.map((part, i) => {
-        if (part.startsWith('**') && part.endsWith('**')) {
-          return <strong key={i} className="font-bold font-semibold">{part.slice(2, -2)}</strong>;
-        }
-        return <span key={i}>{part}</span>;
-      });
-
-      return (
-        <div key={idx} className={`${isList ? 'ml-4 flex gap-2 mt-1.5' : 'mt-1.5'} leading-relaxed`}>
-          {isList && <span className="font-bold inline-block">•</span>}
-          <div className="inline">{formattedLine}</div>
-        </div>
-      );
-    });
+  const handleImageSelect = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith('image/')) {
+       toast.error("Please select an image file");
+       return;
+    }
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
   };
 
+  const cancelImagePreview = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    if(fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const sendImage = async () => {
+    if (!imageFile) return;
+    
+    // Cache file and clear UI immediately so user doesn't wait
+    const fileToSend = imageFile;
+    cancelImagePreview();
+    
+    setIsLoading(true);
+    
+    try {
+      const base64Image = await getBase64(fileToSend);
+      try {
+        await saveAIMessage(auth.currentUser.uid, conversationId, `[IMAGE]${base64Image}`, "user");
+      } catch (e) {
+        await saveAIMessage(auth.currentUser.uid, conversationId, "[Image Attachment]", "user");
+      }
+
+      const formData = new FormData();
+      formData.append("file", fileToSend);
+      
+      const res = await api.post("/api/image-scan", formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+      
+      await saveAIMessage(auth.currentUser.uid, conversationId, res.data.reply, "ai");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to process image: " + (error?.response?.data?.detail || error.message));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleStartRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          audioChunksRef.current.push(e.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        await sendVoiceMessage(audioBlob);
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch (error) {
+      console.error("Microphone access denied", error);
+      toast.error("Microphone access denied");
+    }
+  };
+
+  const handleStopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+    }
+  };
+
+  const toggleRecording = () => {
+    if (isRecording) {
+      handleStopRecording();
+    } else {
+      handleStartRecording();
+    }
+  };
+
+  const sendVoiceMessage = async (audioBlob) => {
+    setIsLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", audioBlob, "voice.webm");
+      
+      const res = await api.post("/api/voice", formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+      
+      const transcript = res.data.transcript;
+      
+      const base64Audio = await getBase64(audioBlob);
+      try {
+        await saveAIMessage(auth.currentUser.uid, conversationId, `[AUDIO]${base64Audio}|${transcript}`, "user");
+      } catch (e) {
+        await saveAIMessage(auth.currentUser.uid, conversationId, `[Voice Message]|${transcript}`, "user");
+      }
+
+      // Automatically send the transcript to chat API
+      const historyForAPI = sortedMessages.map(msg => {
+        let text = msg.text || "";
+        if (text.startsWith("[IMAGE]")) text = "[Image Uploaded]";
+        if (text.startsWith("[AUDIO]")) text = text.split("|").slice(1).join("|");
+        return {
+          role: msg.sender === "user" ? "user" : "model",
+          parts: [{ text }]
+        };
+      });
+
+      const chatRes = await api.post("/api/chat", {
+        message: transcript,
+        history: historyForAPI,
+        persona: selectedPersona
+      });
+      
+      await saveAIMessage(auth.currentUser.uid, conversationId, chatRes.data.reply, "ai");
+      
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to process voice message: " + (error?.response?.data?.detail || error.message));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
   return (
-    <section className='flex flex-col items-start justify-start h-screen w-[100%] background-image'>
+    <section className='flex flex-col items-start justify-start h-[100dvh] w-[100%] background-image overflow-hidden'>
       {/* Chat Header */}
-      <header className='border-b border-border w-[100%] h-[70px] md:h-fit p-4 bg-card '>
+      <header className='flex-shrink-0 border-b border-border w-[100%] h-[70px] md:h-fit p-4 bg-card z-10'>
         <main className='flex items-center gap-3 '>
           <span>
             <div className="w-11 h-11 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center">
-              <span className="text-white font-bold text-lg">🤖</span>
+              <span className="text-white font-bold text-lg">{PERSONAS.find(p => p.id === selectedPersona).icon}</span>
             </div>
           </span>
           <span>
-            <h3 className="font-semibold text-foreground text-lg">ChatVerse AI</h3>
+            <h3 className="font-semibold text-foreground text-lg">{PERSONAS.find(p => p.id === selectedPersona).name}</h3>
             <p className="font-light text-muted-foreground text-sm">@chatverse-ai</p>
           </span>
         </main>
       </header>
 
       {/* Chat Messages Area */}
-      <main className="relative h-[100vh] w-[100%] flex flex-col justify-between ">
-        <section className="px-3 pt-5 pb-20 lg:pb-10 ">
-          <div ref={scrollRef} className="overflow-y-auto overflow-x-hidden h-[80vh]">
+      <main className="flex-1 w-full min-h-0 flex flex-col justify-between border-t border-transparent relative">
+        <section className="px-3 pt-5 pb-2 flex-1 min-h-0 overflow-hidden">
+          <div ref={scrollRef} className="overflow-y-auto overflow-x-hidden h-full pb-4">
             {/* Welcome Message */}
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full text-center py-10">
-                <div className="text-6xl mb-4">🤖</div>
-                <h2 className="text-2xl font-bold text-foreground mb-2">Welcome to ChatVerse AI</h2>
-                <p className="text-muted-foreground mb-4">Ask me anything and I'll help you out!</p>
-                <div className="text-sm text-muted-foreground">
-                  <p>✨ Ask questions</p>
-                  <p>💡 Get suggestions</p>
-                  <p>📚 Learn something new</p>
-                </div>
+                <div className="text-6xl mb-4">{PERSONAS.find(p => p.id === selectedPersona).icon}</div>
+                <h2 className="text-2xl font-bold text-foreground mb-4 w-3/4 leading-relaxed">
+                  {WELCOME_MSGS[selectedPersona]}
+                </h2>
               </div>
             )}
 
@@ -188,7 +305,7 @@ const AIChatbot = () => {
                   <span className="flex gap-3 h-auto ms-10 lg:me-7 me-2.5">
                     <div>
                       <div className="flex items-center bg-primary text-primary-foreground justify-center px-4 py-3 rounded-2xl rounded-tr-sm shadow-sm break-words max-w-[85vw] md:max-w-[60vw]">
-                        <h4 className="text-sm md:text-base">{msg?.text}</h4>
+                        {renderUserContent(msg?.text)}
                       </div>
                       <p className="text-muted-foreground text-xs mt-1.5 text-right">
                         {msg?.timestamp ? formatTimestamp(msg?.timestamp) : ""}
@@ -199,7 +316,7 @@ const AIChatbot = () => {
                   // AI Message
                   <span className="flex gap-2 md:gap-3 lg:ms-6 ms-2">
                     <div className="hidden md:flex w-11 h-11 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 items-center justify-center flex-shrink-0 mt-1">
-                      <span className="text-white font-bold text-lg">🤖</span>
+                      <span className="text-white font-bold text-lg">{PERSONAS.find(p => p.id === selectedPersona).icon}</span>
                     </div>
                     <div className="flex-1 max-w-[90vw] md:max-w-[75vw] lg:max-w-[850px] overflow-hidden">
                       <div className="flex items-start bg-card justify-start px-5 py-3.5 rounded-2xl rounded-tl-sm shadow-sm break-words">
@@ -221,7 +338,7 @@ const AIChatbot = () => {
               <div className="flex flex-col items-start w-full mb-5">
                 <span className="flex gap-2 md:gap-3 lg:ms-6 ms-2">
                   <div className="hidden md:flex w-11 h-11 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-white font-bold text-lg">🤖</span>
+                    <span className="text-white font-bold text-lg">{PERSONAS.find(p => p.id === selectedPersona).icon}</span>
                   </div>
                   <div className="flex items-center gap-3 bg-card px-5 py-4 rounded-2xl rounded-tl-sm shadow-sm w-fit">
                     <span className="flex gap-1.5 items-center">
@@ -233,36 +350,114 @@ const AIChatbot = () => {
                 </span>
               </div>
             )}
-
+            
           </div>
         </section>
 
-        {/* Message Input */}
-        <div className="sticky lg:bottom-0 bottom-[60px] p-3 h-fit w-[100%] ">
-          <form
-            onSubmit={handleSendMessage}
-            className="flex items-center bg-card h-[45px] w-[100%] px-2 rounded-lg relative shadow-lg "
-          >
-            <input
-              value={messageText}
-              onChange={(e) => setMessageText(e.target.value)}
-              disabled={isLoading || !conversationId}
-              type="text"
-              className="h-full text-foreground outline-none text-[16px] pl-3 pr-[40px] rounded-lg w-[100%] bg-transparent disabled:opacity-50"
-              placeholder={isLoading ? "AI is thinking..." : "Ask me anything..."}
-            />
-            <button
-              type="submit"
-              disabled={isLoading || !conversationId}
-              className="flex items-center justify-center absolute right-3 p-2 rounded-md bg-muted hover:brightness-95 disabled:opacity-50"
+        {/* Input Area Header Elements */}
+        <div className="w-full flex-shrink-0 flex flex-col mt-auto bg-transparent pb-3 lg:pb-0 pt-2 lg:pt-0 z-10">
+          {/* Persona Switcher */}
+          <div className="flex gap-2 overflow-x-auto p-2 pb-0 px-3 w-full scrollbar-hide">
+            {PERSONAS.map(p => (
+              <button
+                key={p.id}
+                onClick={() => handlePersonaChange(p.id)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
+                  selectedPersona === p.id 
+                    ? 'bg-teal-600 text-white' 
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                }`}
+              >
+                <span>{p.icon}</span>
+                <span>{p.name}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Image Preview */}
+          {imagePreview && (
+            <div className="w-full px-3 pt-2 pb-0 relative">
+              <div className="relative inline-block">
+                <img src={imagePreview} className="h-16 rounded-md object-cover border border-border mt-1" />
+                <button onClick={cancelImagePreview} className="absolute -top-2 -right-2 bg-red-500/90 hover:bg-red-500 text-white shadow rounded-full p-1 z-10 transition-colors cursor-pointer">
+                  <FiX size={14}/>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Message Input */}
+          <div className="p-3 w-[100%] pt-2">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (imageFile) {
+                  sendImage();
+                } else if (!isRecording) {
+                  handleSendMessage();
+                }
+              }}
+              className="flex items-center bg-card h-[45px] w-[100%] px-1 rounded-lg relative shadow-lg "
             >
-              {isLoading ? (
-                <RiLoader4Line className="animate-spin text-primary" />
-              ) : (
-                <RiSendPlaneFill className="text-primary" />
-              )}
-            </button>
-          </form>
+              <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageSelect} className="hidden" />
+              
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isLoading || !conversationId}
+                className="p-2.5 mx-0.5 text-muted-foreground hover:text-primary transition-colors disabled:opacity-50"
+              >
+                <FiImage size={20} />
+              </button>
+
+              <button
+                type="button"
+                onClick={toggleRecording}
+                disabled={isLoading || !conversationId}
+                className={`p-2.5 mx-0.5 transition-colors relative disabled:opacity-50 ${isRecording ? 'text-red-500' : 'text-muted-foreground hover:text-primary'}`}
+              >
+                {isRecording && (
+                  <span className="absolute inset-2 z-0 rounded-full bg-red-500 opacity-30 animate-ping"></span>
+                )}
+                <FiMic size={20} className="relative z-10" />
+              </button>
+
+              <input
+                value={messageText}
+                onChange={(e) => setMessageText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (!isLoading && conversationId && (messageText.trim() !== "" || imageFile)) {
+                      if (imageFile) sendImage();
+                      else if (!isRecording) handleSendMessage();
+                    }
+                  }
+                }}
+                disabled={isLoading || !conversationId || isRecording || imageFile !== null}
+                type="text"
+                className="h-full text-foreground outline-none text-[16px] pl-2 pr-[45px] rounded-lg w-[100%] bg-transparent disabled:opacity-50"
+                placeholder={
+                  isLoading ? "AI is thinking..." 
+                  : isRecording ? "Recording audio..."
+                  : imageFile ? "Image attached (Add text not supported)"
+                  : "Ask me anything..."
+                }
+              />
+              
+              <button
+                type="submit"
+                disabled={isLoading || !conversationId || (messageText.trim() === "" && !imageFile)}
+                className="flex items-center justify-center absolute right-2.5 p-2 rounded-md bg-muted hover:brightness-95 disabled:opacity-50"
+              >
+                {isLoading ? (
+                  <RiLoader4Line className="animate-spin text-primary" size={18} />
+                ) : (
+                  <RiSendPlaneFill className="text-primary" size={18} />
+                )}
+              </button>
+            </form>
+          </div>
         </div>
       </main>
     </section>

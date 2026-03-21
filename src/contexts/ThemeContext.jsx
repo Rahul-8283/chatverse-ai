@@ -22,7 +22,6 @@ export const ThemeProvider = ({ children }) => {
     // Add current theme class
     root.classList.add(theme);
     
-    // Save to local storage
     localStorage.setItem('theme', theme);
   }, [theme]);
 
