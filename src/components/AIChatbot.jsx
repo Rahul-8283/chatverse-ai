@@ -143,10 +143,15 @@ const AIChatbot = () => {
 
   const sendImage = async () => {
     if (!imageFile) return;
+    
+    // Cache file and clear UI immediately so user doesn't wait
+    const fileToSend = imageFile;
+    cancelImagePreview();
+    
     setIsLoading(true);
     
     try {
-      const base64Image = await getBase64(imageFile);
+      const base64Image = await getBase64(fileToSend);
       try {
         await saveAIMessage(auth.currentUser.uid, conversationId, `[IMAGE]${base64Image}`, "user");
       } catch (e) {
@@ -154,14 +159,13 @@ const AIChatbot = () => {
       }
 
       const formData = new FormData();
-      formData.append("file", imageFile);
+      formData.append("file", fileToSend);
       
       const res = await api.post("/api/image-scan", formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
       
       await saveAIMessage(auth.currentUser.uid, conversationId, res.data.reply, "ai");
-      cancelImagePreview();
     } catch (error) {
       console.error(error);
       toast.error("Failed to process image: " + (error?.response?.data?.detail || error.message));
@@ -260,9 +264,9 @@ const AIChatbot = () => {
 
 
   return (
-    <section className='flex flex-col items-start justify-start h-screen w-[100%] background-image'>
+    <section className='flex flex-col items-start justify-start h-[100dvh] w-[100%] background-image overflow-hidden'>
       {/* Chat Header */}
-      <header className='border-b border-border w-[100%] h-[70px] md:h-fit p-4 bg-card '>
+      <header className='flex-shrink-0 border-b border-border w-[100%] h-[70px] md:h-fit p-4 bg-card z-10'>
         <main className='flex items-center gap-3 '>
           <span>
             <div className="w-11 h-11 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center">
@@ -277,8 +281,8 @@ const AIChatbot = () => {
       </header>
 
       {/* Chat Messages Area */}
-      <main className="relative h-[100vh] w-[100%] flex flex-col justify-between ">
-        <section className="px-3 pt-5 pb-20 lg:pb-10 h-[70vh] flex-grow">
+      <main className="flex-1 w-full min-h-0 flex flex-col justify-between border-t border-transparent relative">
+        <section className="px-3 pt-5 pb-2 flex-1 min-h-0 overflow-hidden">
           <div ref={scrollRef} className="overflow-y-auto overflow-x-hidden h-full pb-4">
             {/* Welcome Message */}
             {messages.length === 0 && (
@@ -351,7 +355,7 @@ const AIChatbot = () => {
         </section>
 
         {/* Input Area Header Elements */}
-        <div className="w-full flex flex-col mt-auto bg-transparent pb-3 lg:pb-0 pt-2 lg:pt-0">
+        <div className="w-full flex-shrink-0 flex flex-col mt-auto bg-transparent pb-3 lg:pb-0 pt-2 lg:pt-0 z-10">
           {/* Persona Switcher */}
           <div className="flex gap-2 overflow-x-auto p-2 pb-0 px-3 w-full scrollbar-hide">
             {PERSONAS.map(p => (
@@ -421,6 +425,15 @@ const AIChatbot = () => {
               <input
                 value={messageText}
                 onChange={(e) => setMessageText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (!isLoading && conversationId && (messageText.trim() !== "" || imageFile)) {
+                      if (imageFile) sendImage();
+                      else if (!isRecording) handleSendMessage();
+                    }
+                  }
+                }}
                 disabled={isLoading || !conversationId || isRecording || imageFile !== null}
                 type="text"
                 className="h-full text-foreground outline-none text-[16px] pl-2 pr-[45px] rounded-lg w-[100%] bg-transparent disabled:opacity-50"
