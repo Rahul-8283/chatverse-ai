@@ -115,7 +115,7 @@ const Register = ({isLogin, setIsLogin}) => {
             <div className="bg-card shadow-2xl p-7 sm:p-9 rounded-3xl w-[90%] max-w-[425px] flex flex-col justify-center items-center border border-border/50 relative z-10 my-4">
                 <div className="mb-7 w-full flex flex-col items-center">
                     <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-4 border border-primary/20 shadow-inner">
-                        <FaUserPlus className="text-primary text-[22px] ml-1" />
+                        <FaUserPlus className="text-primary text-[22px] translate-x-[2px]" />
                     </div>
                     <h1 className="text-center text-[26px] font-extrabold text-foreground tracking-tight mb-2">Create Account</h1>
                     <p className="text-center text-sm text-muted-foreground">Sign up to get started with ChatVerse</p>

@@ -73,7 +73,7 @@ const Login = ({isLogin, setIsLogin}) => {
             <div className="bg-card shadow-2xl p-7 sm:p-9 rounded-3xl w-[90%] max-w-[400px] flex flex-col justify-center items-center border border-border/50 relative z-10">
                 <div className="mb-7 w-full flex flex-col items-center">
                     <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-4 border border-primary/20 shadow-inner">
-                        <FaSignInAlt className="text-primary text-[22px] ml-1" />
+                        <FaSignInAlt className="text-primary text-[22px] translate-x-[2px]" />
                     </div>
                     <h1 className="text-center text-[26px] font-extrabold text-foreground tracking-tight mb-2">Welcome Back</h1>
                     <p className="text-center text-sm text-muted-foreground">Sign in to continue to ChatVerse</p>
