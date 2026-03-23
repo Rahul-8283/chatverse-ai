@@ -9,7 +9,7 @@ import { useTheme } from '../contexts/ThemeContext.jsx';
 import { RiMoonLine, RiSunLine } from "react-icons/ri";
 
 
-const Register = ({isLogin, setIsLogin}) => {
+const Register = ({ isLogin, setIsLogin }) => {
     const { theme, toggleTheme } = useTheme();
     const [userData, setUserData] = useState({ fullName: "", email: "", password: "", passwordConfirm: "" });
     const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +39,7 @@ const Register = ({isLogin, setIsLogin}) => {
             toast.error("Email is required");
             return;
         }
-        
+
         if (!validateEmail(userData?.email)) {
             toast.error("Please enter a valid email address");
             return;
@@ -66,7 +66,7 @@ const Register = ({isLogin, setIsLogin}) => {
         }
 
         setIsLoading(true);
-        try{
+        try {
             // Create user with Firebase Auth - this will throw error if email already exists
             const userCredential = await createUserWithEmailAndPassword(auth, userData?.email, userData?.password);
             const user = userCredential.user;
@@ -82,10 +82,9 @@ const Register = ({isLogin, setIsLogin}) => {
                 image: "",
             });
 
-            toast.success("Account created successfully! 🎉 Welcome to ChatVerse");
             setUserData({ fullName: "", email: "", password: "", passwordConfirm: "" });
         }
-        catch(error){
+        catch (error) {
             console.log(error);
             if (error.code === "auth/email-already-in-use") {
                 toast.warning("This email is already registered. Please login instead");
@@ -97,15 +96,15 @@ const Register = ({isLogin, setIsLogin}) => {
                 toast.error(error.message || "Registration failed. Please try again");
             }
         }
-        finally{
+        finally {
             setIsLoading(false);
         }
     }
 
     return (
         <section className="flex flex-col justify-center items-center h-[100vh] background-image relative">
-            <button 
-                onClick={toggleTheme} 
+            <button
+                onClick={toggleTheme}
                 className="absolute top-4 right-4 z-50 p-2.5 rounded-full bg-card border border-border text-foreground shadow-md hover:bg-muted transition-colors"
                 title="Toggle Theme"
             >
@@ -120,7 +119,7 @@ const Register = ({isLogin, setIsLogin}) => {
                     <h1 className="text-center text-[26px] font-extrabold text-foreground tracking-tight mb-2">Create Account</h1>
                     <p className="text-center text-sm text-muted-foreground">Sign up to get started with ChatVerse</p>
                 </div>
-                
+
                 <div className="w-full mb-7 space-y-3.5">
                     <div className="relative">
                         <input type="text" name="fullName" onChange={handleChangeUserData} value={userData.fullName} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); document.getElementsByName('email')[0]?.focus(); } }} className="w-full p-3.5 rounded-xl bg-background border border-border text-foreground font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-muted-foreground/70 shadow-sm" placeholder="Full Name" />
@@ -145,7 +144,7 @@ const Register = ({isLogin, setIsLogin}) => {
                         )}
                     </button>
                 </div>
-                
+
                 <div className="mt-2 text-center text-muted-foreground text-sm">
                     <button onClick={() => setIsLogin(!isLogin)} className="hover:text-primary transition-colors font-medium">Already have an account? <span className="text-primary font-bold">Sign In</span></button>
                 </div>

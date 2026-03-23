@@ -67,7 +67,6 @@ const AIChatbot = () => {
   const handlePersonaChange = (personaId) => {
     setSelectedPersona(personaId);
     setMessages([]); // Temporarily clear UI until firestore syncs
-    toast.success(`Switched to ${PERSONAS.find(p => p.id === personaId).name}`);
   };
 
   const handleSendMessage = async (e) => {

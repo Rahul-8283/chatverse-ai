@@ -7,9 +7,9 @@ import { validateEmail } from '../utils/validation.js';
 import { useTheme } from '../contexts/ThemeContext.jsx';
 import { RiMoonLine, RiSunLine } from "react-icons/ri";
 
-const Login = ({isLogin, setIsLogin}) => {
+const Login = ({ isLogin, setIsLogin }) => {
     const { theme, toggleTheme } = useTheme();
-    const [userData, setUserData] = useState({email: "", password: "" });
+    const [userData, setUserData] = useState({ email: "", password: "" });
     const [isLoading, setIsLoading] = useState(false);
 
     const handleChangeUserData = (e) => {
@@ -41,9 +41,8 @@ const Login = ({isLogin, setIsLogin}) => {
         setIsLoading(true);
         try {
             await signInWithEmailAndPassword(auth, userData?.email, userData?.password);
-            toast.success("Login successful! Welcome back 👋");
         }
-        catch(error){
+        catch (error) {
             console.log(error);
             if (error.code === "auth/user-not-found") {
                 toast.error("No account found with this email");
@@ -55,15 +54,15 @@ const Login = ({isLogin, setIsLogin}) => {
                 toast.error(error.message || "Login failed. Please try again");
             }
         }
-        finally{
+        finally {
             setIsLoading(false);
         }
     };
 
     return (
         <section className="flex flex-col justify-center items-center h-[100vh] background-image relative">
-            <button 
-                onClick={toggleTheme} 
+            <button
+                onClick={toggleTheme}
                 className="absolute top-4 right-4 z-50 p-2.5 rounded-full bg-card border border-border text-foreground shadow-md hover:bg-muted transition-colors"
                 title="Toggle Theme"
             >
@@ -73,12 +72,12 @@ const Login = ({isLogin, setIsLogin}) => {
             <div className="bg-card shadow-2xl p-7 sm:p-9 rounded-3xl w-[90%] max-w-[400px] flex flex-col justify-center items-center border border-border/50 relative z-10">
                 <div className="mb-7 w-full flex flex-col items-center">
                     <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-4 border border-primary/20 shadow-inner">
-                        <FaSignInAlt className="text-primary text-[22px] translate-x-[2px]" />
+                        <FaSignInAlt className="text-primary text-[22px] translate-x-[0px]" />
                     </div>
                     <h1 className="text-center text-[26px] font-extrabold text-foreground tracking-tight mb-2">Welcome Back</h1>
                     <p className="text-center text-sm text-muted-foreground">Sign in to continue to ChatVerse</p>
                 </div>
-                
+
                 <div className="w-full mb-7 space-y-3.5">
                     <div className="relative">
                         <input type="email" name="email" value={userData.email} onChange={handleChangeUserData} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); document.getElementsByName('password')[0]?.focus(); } }} className="w-full p-3.5 rounded-xl bg-background border border-border text-foreground font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-muted-foreground/70 shadow-sm" placeholder="Email Address" />
