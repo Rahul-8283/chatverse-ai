@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { FaSignInAlt } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
 import { toast } from "react-toastify";
-import { auth } from '../firebase/firebase.js';
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth, googleProvider, db } from '../firebase/firebase.js';
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { validateEmail } from '../utils/validation.js';
 import { useTheme } from '../contexts/ThemeContext.jsx';
 import { RiMoonLine, RiSunLine } from "react-icons/ri";
@@ -59,6 +61,32 @@ const Login = ({ isLogin, setIsLogin }) => {
         }
     };
 
+    const handleGoogleAuth = async () => {
+        setIsLoading(true);
+        try {
+            const result = await signInWithPopup(auth, googleProvider);
+            const user = result.user;
+
+            const userDocRef = doc(db, "users", user.uid);
+            const userDoc = await getDoc(userDocRef);
+
+            if (!userDoc.exists()) {
+                await setDoc(userDocRef, {
+                    uid: user.uid,
+                    email: user.email,
+                    username: user.email?.split("@")[0],
+                    fullName: user.displayName || "Google User",
+                    image: user.photoURL || "",
+                });
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error("Google sign-in failed. Please try again.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <section className="flex flex-col justify-center items-center h-[100vh] background-image relative">
             <button
@@ -94,6 +122,21 @@ const Login = ({ isLogin, setIsLogin }) => {
                         ) : (
                             <>Sign In</>
                         )}
+                    </button>
+
+                    <div className="flex items-center my-5">
+                        <div className="flex-1 h-[1px] bg-border/60"></div>
+                        <span className="px-3 text-muted-foreground text-sm font-medium">OR</span>
+                        <div className="flex-1 h-[1px] bg-border/60"></div>
+                    </div>
+
+                    <button 
+                        disabled={isLoading} 
+                        onClick={handleGoogleAuth} 
+                        className="w-full py-3 rounded-xl border border-border bg-card/50 hover:bg-muted focus:ring-2 focus:ring-primary/20 flex items-center justify-center gap-3 transition-all font-semibold shadow-sm text-foreground disabled:opacity-70 disabled:hover:bg-card/50"
+                    >
+                        <FcGoogle className="text-[22px]" />
+                        <span>Continue with Google</span>
                     </button>
                 </div>
 
