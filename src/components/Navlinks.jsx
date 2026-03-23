@@ -48,7 +48,7 @@ const Navlinks = () => {
             </button>
           </li>
           <li className="">
-            <button onClick={toggleTheme} className="lg:text-[28px] text-[22px] cursor-pointer hover:text-[#25d366] transition-colors">
+            <button onClick={toggleTheme} className="lg:text-[28px] text-[22px] cursor-pointer hover:text-[#121a17] transition-colors">
               {theme === 'dark' ? <RiSunLine color="#fff" /> : <RiMoonLine color="#fff" />}
             </button>
           </li>

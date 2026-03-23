@@ -67,7 +67,6 @@ const AIChatbot = () => {
   const handlePersonaChange = (personaId) => {
     setSelectedPersona(personaId);
     setMessages([]); // Temporarily clear UI until firestore syncs
-    toast.success(`Switched to ${PERSONAS.find(p => p.id === personaId).name}`);
   };
 
   const handleSendMessage = async (e) => {
@@ -269,8 +268,8 @@ const AIChatbot = () => {
       <header className='flex-shrink-0 border-b border-border w-[100%] h-[70px] md:h-fit p-4 bg-card z-10'>
         <main className='flex items-center gap-3 '>
           <span>
-            <div className="w-11 h-11 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center">
-              <span className="text-white font-bold text-lg">{PERSONAS.find(p => p.id === selectedPersona).icon}</span>
+            <div className="w-11 h-11 rounded-full bg-primary flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-lg">{PERSONAS.find(p => p.id === selectedPersona).icon}</span>
             </div>
           </span>
           <span>
@@ -315,8 +314,8 @@ const AIChatbot = () => {
                 ) : (
                   // AI Message
                   <span className="flex gap-2 md:gap-3 lg:ms-6 ms-2">
-                    <div className="hidden md:flex w-11 h-11 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 items-center justify-center flex-shrink-0 mt-1">
-                      <span className="text-white font-bold text-lg">{PERSONAS.find(p => p.id === selectedPersona).icon}</span>
+                    <div className="hidden md:flex w-11 h-11 rounded-full bg-primary items-center justify-center flex-shrink-0 mt-1">
+                      <span className="text-primary-foreground font-bold text-lg">{PERSONAS.find(p => p.id === selectedPersona).icon}</span>
                     </div>
                     <div className="flex-1 max-w-[90vw] md:max-w-[75vw] lg:max-w-[850px] overflow-hidden">
                       <div className="flex items-start bg-card justify-start px-5 py-3.5 rounded-2xl rounded-tl-sm shadow-sm break-words">
@@ -337,8 +336,8 @@ const AIChatbot = () => {
             {isLoading && (
               <div className="flex flex-col items-start w-full mb-5">
                 <span className="flex gap-2 md:gap-3 lg:ms-6 ms-2">
-                  <div className="hidden md:flex w-11 h-11 rounded-full bg-gradient-to-br from-purple-400 to-blue-500 items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-white font-bold text-lg">{PERSONAS.find(p => p.id === selectedPersona).icon}</span>
+                  <div className="hidden md:flex w-11 h-11 rounded-full bg-primary items-center justify-center flex-shrink-0 mt-1">
+                    <span className="text-primary-foreground font-bold text-lg">{PERSONAS.find(p => p.id === selectedPersona).icon}</span>
                   </div>
                   <div className="flex items-center gap-3 bg-card px-5 py-4 rounded-2xl rounded-tl-sm shadow-sm w-fit">
                     <span className="flex gap-1.5 items-center">
@@ -364,7 +363,7 @@ const AIChatbot = () => {
                 onClick={() => handlePersonaChange(p.id)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
                   selectedPersona === p.id 
-                    ? 'bg-teal-600 text-white' 
+                    ? 'bg-primary text-primary-foreground' 
                     : 'bg-muted text-muted-foreground hover:bg-muted/80'
                 }`}
               >
