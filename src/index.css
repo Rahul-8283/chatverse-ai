@@ -8,34 +8,34 @@
   --color-primary-foreground: var(--primary-fg);
   --color-border: var(--border);
   --color-card: var(--card);
-  --color-card-foreground: var(--card-fg);
+  --color-card-foreground: var(--card-fg);  
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-fg);
 }
 
 @layer base {
   :root {
-    --bg: #e5f6f3;
-    --fg: #0a1f1a;
-    --primary: #01AA85;
+    --bg: #f5f8f6;
+    --fg: #0a1410;
+    --primary: #4a7c5f;
     --primary-fg: #ffffff;
-    --border: #c4ece3;
+    --border: #d4e4db;
     --card: #ffffff;
-    --card-fg: #0a1f1a;
-    --muted: #f1f5f9;
-    --muted-fg: #64748b;
+    --card-fg: #0a1410;
+    --muted: #eaf1ed;
+    --muted-fg: #5a7068;
   }
 
   .dark {
-    --bg: #0d2420;
-    --fg: #f8fafc;
-    --primary: #25d366;
-    --primary-fg: #000000;
-    --border: #1f423a;
-    --card: #15332c;
-    --card-fg: #f8fafc;
-    --muted: #1e453c;
-    --muted-fg: #94a3b8;
+    --bg: #0a0f0e;
+    --fg: #f0f4f2;
+    --primary: #8db87a;
+    --primary-fg: #0a0f0e;
+    --border: #1a2e28;
+    --card: #121a17;
+    --card-fg: #f0f4f2;
+    --muted: #16211c;
+    --muted-fg: #7a9490;
   }
 }
 

@@ -23,12 +23,12 @@ const SplashScreen = ({ onFinish }) => {
 
   return (
     <div 
-      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#0d2420] transition-opacity duration-300 ${isFading ? 'opacity-0' : 'opacity-100'}`}
+      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#0a0f0e] transition-opacity duration-300 ${isFading ? 'opacity-0' : 'opacity-100'}`}
     >
       {/* Loading Bar at Top */}
-      <div className="absolute top-0 left-0 w-full h-1.5 bg-[#0a1f1a]">
+      <div className="absolute top-0 left-0 w-full h-1.5 bg-[#121a17]">
         <div 
-          className="h-full bg-[#25d366]" 
+          className="h-full bg-[#8db87a]" 
           style={{
             animation: 'fillBar 2.5s ease-in-out forwards'
           }}
@@ -38,7 +38,7 @@ const SplashScreen = ({ onFinish }) => {
       <div className="relative flex flex-col items-center justify-center flex-1 w-full">
         {/* Logo/Icon container with pulsing glow */}
         <div className="relative mb-6">
-          <div className="absolute inset-0 bg-[#25d366] rounded-full blur-[35px] opacity-40 animate-pulse"></div>
+          <div className="absolute inset-0 bg-[#8db87a] rounded-full blur-[35px] opacity-40 animate-pulse"></div>
           <div className="relative flex items-center justify-center">
             <img src={logo} alt="ChatVerse Logo" className="w-[100px] h-[100px] object-contain drop-shadow-md relative z-10" />
           </div>
@@ -47,7 +47,7 @@ const SplashScreen = ({ onFinish }) => {
         {/* Brand Name */}
         <div className="flex items-center space-x-2 text-4xl font-bold tracking-tight mb-2">
           <span className="text-white">ChatVerse</span>
-          <span className="text-[#25d366]">AI</span>
+          <span className="text-[#8db87a]">AI</span>
         </div>
 
         {/* Tagline */}
