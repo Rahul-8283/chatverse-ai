@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { FaSignInAlt } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
 import { toast } from "react-toastify";
-import { auth } from '../firebase/firebase.js';
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth, googleProvider, db } from '../firebase/firebase.js';
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { validateEmail } from '../utils/validation.js';
 import { useTheme } from '../contexts/ThemeContext.jsx';
 import { RiMoonLine, RiSunLine } from "react-icons/ri";
+import { motion } from "framer-motion";
 
 const Login = ({ isLogin, setIsLogin }) => {
     const { theme, toggleTheme } = useTheme();
@@ -59,6 +62,32 @@ const Login = ({ isLogin, setIsLogin }) => {
         }
     };
 
+    const handleGoogleAuth = async () => {
+        setIsLoading(true);
+        try {
+            const result = await signInWithPopup(auth, googleProvider);
+            const user = result.user;
+
+            const userDocRef = doc(db, "users", user.uid);
+            const userDoc = await getDoc(userDocRef);
+
+            if (!userDoc.exists()) {
+                await setDoc(userDocRef, {
+                    uid: user.uid,
+                    email: user.email,
+                    username: user.email?.split("@")[0],
+                    fullName: user.displayName || "Google User",
+                    image: user.photoURL || "",
+                });
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error("Google sign-in failed. Please try again.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <section className="flex flex-col justify-center items-center h-[100vh] background-image relative">
             <button
@@ -69,7 +98,12 @@ const Login = ({ isLogin, setIsLogin }) => {
                 {theme === 'dark' ? <RiSunLine size={22} /> : <RiMoonLine size={22} />}
             </button>
             <div className="absolute inset-0 bg-background/40 backdrop-blur-[2px]"></div>
-            <div className="bg-card shadow-2xl p-7 sm:p-9 rounded-3xl w-[90%] max-w-[400px] flex flex-col justify-center items-center border border-border/50 relative z-10">
+            <motion.div 
+                initial={{ opacity: 0, y: 20, scale: 0.95, filter: "blur(10px)" }}
+                animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                className="bg-card shadow-2xl p-7 sm:p-9 rounded-3xl w-[90%] max-w-[400px] flex flex-col justify-center items-center border border-border/50 relative z-10"
+            >
                 <div className="mb-7 w-full flex flex-col items-center">
                     <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-4 border border-primary/20 shadow-inner">
                         <FaSignInAlt className="text-primary text-[22px] translate-x-[0px]" />
@@ -95,12 +129,27 @@ const Login = ({ isLogin, setIsLogin }) => {
                             <>Sign In</>
                         )}
                     </button>
+
+                    <div className="flex items-center my-5">
+                        <div className="flex-1 h-[1px] bg-border/60"></div>
+                        <span className="px-3 text-muted-foreground text-sm font-medium">OR</span>
+                        <div className="flex-1 h-[1px] bg-border/60"></div>
+                    </div>
+
+                    <button 
+                        disabled={isLoading} 
+                        onClick={handleGoogleAuth} 
+                        className="w-full py-3 rounded-xl border border-border bg-card/50 hover:bg-muted focus:ring-2 focus:ring-primary/20 flex items-center justify-center gap-3 transition-all font-semibold shadow-sm text-foreground disabled:opacity-70 disabled:hover:bg-card/50"
+                    >
+                        <FcGoogle className="text-[22px]" />
+                        <span>Continue with Google</span>
+                    </button>
                 </div>
 
                 <div className="mt-2 text-center text-muted-foreground text-sm">
                     <button onClick={() => setIsLogin(!isLogin)} className="hover:text-primary transition-colors font-medium">Don't have an account yet? <span className="text-primary font-bold">Sign Up</span></button>
                 </div>
-            </div>
+            </motion.div>
         </section>
     );
 };
