@@ -92,8 +92,8 @@ const Chatlist = ({ setSelectedUser }) => {
             className="flex items-start justify-between w-[100%] border-b border-border px-5 py-3 hover:bg-muted transition"
           >
             <div className="flex items-start gap-3">
-              <div className="w-[40px] h-[40px] rounded-full bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center flex-shrink-0">
-                <span className="text-white font-bold text-xl">🤖</span>
+              <div className="w-[40px] h-[40px] rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                <span className="text-primary-foreground font-bold text-xl">🤖</span>
               </div>
               <span>
                 <h2 className="p-0 font-semibold text-foreground text-left text-[17px]">
