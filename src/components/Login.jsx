@@ -8,6 +8,7 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { validateEmail } from '../utils/validation.js';
 import { useTheme } from '../contexts/ThemeContext.jsx';
 import { RiMoonLine, RiSunLine } from "react-icons/ri";
+import { motion } from "framer-motion";
 
 const Login = ({ isLogin, setIsLogin }) => {
     const { theme, toggleTheme } = useTheme();
@@ -97,7 +98,12 @@ const Login = ({ isLogin, setIsLogin }) => {
                 {theme === 'dark' ? <RiSunLine size={22} /> : <RiMoonLine size={22} />}
             </button>
             <div className="absolute inset-0 bg-background/40 backdrop-blur-[2px]"></div>
-            <div className="bg-card shadow-2xl p-7 sm:p-9 rounded-3xl w-[90%] max-w-[400px] flex flex-col justify-center items-center border border-border/50 relative z-10">
+            <motion.div 
+                initial={{ opacity: 0, y: 20, scale: 0.95, filter: "blur(10px)" }}
+                animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                className="bg-card shadow-2xl p-7 sm:p-9 rounded-3xl w-[90%] max-w-[400px] flex flex-col justify-center items-center border border-border/50 relative z-10"
+            >
                 <div className="mb-7 w-full flex flex-col items-center">
                     <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-4 border border-primary/20 shadow-inner">
                         <FaSignInAlt className="text-primary text-[22px] translate-x-[0px]" />
@@ -143,7 +149,7 @@ const Login = ({ isLogin, setIsLogin }) => {
                 <div className="mt-2 text-center text-muted-foreground text-sm">
                     <button onClick={() => setIsLogin(!isLogin)} className="hover:text-primary transition-colors font-medium">Don't have an account yet? <span className="text-primary font-bold">Sign Up</span></button>
                 </div>
-            </div>
+            </motion.div>
         </section>
     );
 };

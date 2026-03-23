@@ -8,6 +8,7 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { validateEmail, validateFullName, validatePassword, passwordsMatch } from '../utils/validation.js';
 import { useTheme } from '../contexts/ThemeContext.jsx';
 import { RiMoonLine, RiSunLine } from "react-icons/ri";
+import { motion } from "framer-motion";
 
 
 const Register = ({ isLogin, setIsLogin }) => {
@@ -138,7 +139,12 @@ const Register = ({ isLogin, setIsLogin }) => {
                 {theme === 'dark' ? <RiSunLine size={22} /> : <RiMoonLine size={22} />}
             </button>
             <div className="absolute inset-0 bg-background/40 backdrop-blur-[2px]"></div>
-            <div className="bg-card shadow-2xl p-6 sm:p-7 rounded-3xl w-[90%] max-w-[425px] flex flex-col justify-center items-center border border-border/50 relative z-10 my-4">
+            <motion.div 
+                initial={{ opacity: 0, y: -20, scale: 0.95, filter: "blur(10px)" }}
+                animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                className="bg-card shadow-2xl p-6 sm:p-7 rounded-3xl w-[90%] max-w-[425px] flex flex-col justify-center items-center border border-border/50 relative z-10 my-4"
+            >
                 <div className="mb-5 w-full flex flex-col items-center">
                     <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-3 border border-primary/20 shadow-inner">
                         <FaUserPlus className="text-primary text-[20px] translate-x-[2px]" />
@@ -190,7 +196,7 @@ const Register = ({ isLogin, setIsLogin }) => {
                 <div className="mt-1 text-center text-muted-foreground text-sm">
                     <button onClick={() => setIsLogin(!isLogin)} className="hover:text-primary transition-colors font-medium">Already have an account? <span className="text-primary font-bold">Sign In</span></button>
                 </div>
-            </div>
+            </motion.div>
         </section>
     );
 };
