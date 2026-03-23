@@ -138,32 +138,32 @@ const Register = ({ isLogin, setIsLogin }) => {
                 {theme === 'dark' ? <RiSunLine size={22} /> : <RiMoonLine size={22} />}
             </button>
             <div className="absolute inset-0 bg-background/40 backdrop-blur-[2px]"></div>
-            <div className="bg-card shadow-2xl p-7 sm:p-9 rounded-3xl w-[90%] max-w-[425px] flex flex-col justify-center items-center border border-border/50 relative z-10 my-4">
-                <div className="mb-7 w-full flex flex-col items-center">
-                    <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-4 border border-primary/20 shadow-inner">
-                        <FaUserPlus className="text-primary text-[22px] translate-x-[2px]" />
+            <div className="bg-card shadow-2xl p-6 sm:p-7 rounded-3xl w-[90%] max-w-[425px] flex flex-col justify-center items-center border border-border/50 relative z-10 my-4">
+                <div className="mb-5 w-full flex flex-col items-center">
+                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-3 border border-primary/20 shadow-inner">
+                        <FaUserPlus className="text-primary text-[20px] translate-x-[2px]" />
                     </div>
-                    <h1 className="text-center text-[26px] font-extrabold text-foreground tracking-tight mb-2">Create Account</h1>
+                    <h1 className="text-center text-[24px] font-extrabold text-foreground tracking-tight mb-1.5">Create Account</h1>
                     <p className="text-center text-sm text-muted-foreground">Sign up to get started with ChatVerse</p>
                 </div>
 
-                <div className="w-full mb-7 space-y-3.5">
+                <div className="w-full mb-5 space-y-3">
                     <div className="relative">
-                        <input type="text" name="fullName" onChange={handleChangeUserData} value={userData.fullName} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); document.getElementsByName('email')[0]?.focus(); } }} className="w-full p-3.5 rounded-xl bg-background border border-border text-foreground font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-muted-foreground/70 shadow-sm" placeholder="Full Name" />
+                        <input type="text" name="fullName" onChange={handleChangeUserData} value={userData.fullName} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); document.getElementsByName('email')[0]?.focus(); } }} className="w-full p-3 rounded-xl bg-background border border-border text-foreground font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-muted-foreground/70 shadow-sm" placeholder="Full Name" />
                     </div>
                     <div className="relative">
-                        <input type="email" name="email" onChange={handleChangeUserData} value={userData.email} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); document.getElementsByName('password')[0]?.focus(); } }} className="w-full p-3.5 rounded-xl bg-background border border-border text-foreground font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-muted-foreground/70 shadow-sm" placeholder="Email Address" />
+                        <input type="email" name="email" onChange={handleChangeUserData} value={userData.email} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); document.getElementsByName('password')[0]?.focus(); } }} className="w-full p-3 rounded-xl bg-background border border-border text-foreground font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-muted-foreground/70 shadow-sm" placeholder="Email Address" />
                     </div>
                     <div className="relative">
-                        <input type="password" name="password" onChange={handleChangeUserData} value={userData.password} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); document.getElementsByName('passwordConfirm')[0]?.focus(); } }} className="w-full p-3.5 rounded-xl bg-background border border-border text-foreground font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-muted-foreground/70 shadow-sm" placeholder="Password" />
+                        <input type="password" name="password" onChange={handleChangeUserData} value={userData.password} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); document.getElementsByName('passwordConfirm')[0]?.focus(); } }} className="w-full p-3 rounded-xl bg-background border border-border text-foreground font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-muted-foreground/70 shadow-sm" placeholder="Password" />
                     </div>
                     <div className="relative">
-                        <input type="password" name="passwordConfirm" onChange={handleChangeUserData} value={userData.passwordConfirm} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAuth(); } }} className="w-full p-3.5 rounded-xl bg-background border border-border text-foreground font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-muted-foreground/70 shadow-sm" placeholder="Confirm Password" />
+                        <input type="password" name="passwordConfirm" onChange={handleChangeUserData} value={userData.passwordConfirm} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAuth(); } }} className="w-full p-3 rounded-xl bg-background border border-border text-foreground font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-muted-foreground/70 shadow-sm" placeholder="Confirm Password" />
                     </div>
                 </div>
 
-                <div className="w-full mb-6">
-                    <button disabled={isLoading} onClick={handleAuth} className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-[17px] w-full py-3.5 rounded-xl flex items-center gap-2 justify-center shadow-[0_4px_14px_0_rgba(1,170,133,0.39)] hover:shadow-[0_6px_20px_rgba(1,170,133,0.23)] hover:-translate-y-0.5 transition-all outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:shadow-none">
+                <div className="w-full mb-5">
+                    <button disabled={isLoading} onClick={handleAuth} className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-[17px] w-full py-3 rounded-xl flex items-center gap-2 justify-center shadow-[0_4px_14px_0_rgba(1,170,133,0.39)] hover:shadow-[0_6px_20px_rgba(1,170,133,0.23)] hover:-translate-y-0.5 transition-all outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:shadow-none">
                         {isLoading ? (
                             <>Registering...</>
                         ) : (
@@ -171,7 +171,7 @@ const Register = ({ isLogin, setIsLogin }) => {
                         )}
                     </button>
 
-                    <div className="flex items-center my-5">
+                    <div className="flex items-center my-4">
                         <div className="flex-1 h-[1px] bg-border/60"></div>
                         <span className="px-3 text-muted-foreground text-sm font-medium">OR</span>
                         <div className="flex-1 h-[1px] bg-border/60"></div>
@@ -187,7 +187,7 @@ const Register = ({ isLogin, setIsLogin }) => {
                     </button>
                 </div>
 
-                <div className="mt-2 text-center text-muted-foreground text-sm">
+                <div className="mt-1 text-center text-muted-foreground text-sm">
                     <button onClick={() => setIsLogin(!isLogin)} className="hover:text-primary transition-colors font-medium">Already have an account? <span className="text-primary font-bold">Sign In</span></button>
                 </div>
             </div>

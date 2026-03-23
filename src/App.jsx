@@ -12,7 +12,7 @@ import { auth, db, initializeAIBot } from "./firebase/firebase.js";
 import logo from "./assets/logo.png";
 
 const App = () => {
-    const [isLogin, setIsLogin] = useState(false);
+    const [isLogin, setIsLogin] = useState(true);
     const [user, setUser] = useState(null);
     const [selectedUser, setSelectedUser] = useState(null);
     const [showSplash, setShowSplash] = useState(true);
