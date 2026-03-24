@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import { RiSendPlaneFill, RiLoader4Line } from "react-icons/ri";
 import { FiImage, FiMic, FiX } from "react-icons/fi";
-import api from '../config/axiosConfig';
+import { useApiStore } from '../store/useApiStore';
 import { saveAIMessage, listenForAIMessages } from '../firebase/firebase';
 import formatTimestamp from '../utils/formatTimestamp';
 import { auth } from '../firebase/firebase';
@@ -13,6 +13,7 @@ const AIChatbot = () => {
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { sendChat, sendImageScan, sendVoice } = useApiStore();
   const [conversationId, setConversationId] = useState(null);
   const scrollRef = useRef(null);
   const unsubscribeRef = useRef(null);
@@ -101,7 +102,7 @@ const AIChatbot = () => {
         };
       });
 
-      const res = await api.post("/api/chat", {
+      const res = await sendChat({
         message: userMessageText,
         history: historyForAPI,
         persona: selectedPersona
@@ -157,12 +158,7 @@ const AIChatbot = () => {
         await saveAIMessage(auth.currentUser.uid, conversationId, "[Image Attachment]", "user");
       }
 
-      const formData = new FormData();
-      formData.append("file", fileToSend);
-      
-      const res = await api.post("/api/image-scan", formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
+      const res = await sendImageScan(fileToSend);
       
       await saveAIMessage(auth.currentUser.uid, conversationId, res.data.reply, "ai");
     } catch (error) {
@@ -218,12 +214,7 @@ const AIChatbot = () => {
   const sendVoiceMessage = async (audioBlob) => {
     setIsLoading(true);
     try {
-      const formData = new FormData();
-      formData.append("file", audioBlob, "voice.webm");
-      
-      const res = await api.post("/api/voice", formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
+      const res = await sendVoice(audioBlob);
       
       const transcript = res.data.transcript;
       
@@ -245,7 +236,7 @@ const AIChatbot = () => {
         };
       });
 
-      const chatRes = await api.post("/api/chat", {
+      const chatRes = await sendChat({
         message: transcript,
         history: historyForAPI,
         persona: selectedPersona
