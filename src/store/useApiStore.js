@@ -7,11 +7,12 @@ export const useApiStore = create((set) => ({
 
   sendChat: async ({ message, history, persona }) => {
     set({ isLoading: true, error: null });
-    try {
+    try{
       const res = await api.post("/api/chat", { message, history, persona });
       set({ isLoading: false });
       return res;
-    } catch (error) {
+    } 
+    catch(error){
       set({ isLoading: false, error: error?.response?.data?.detail || error.message });
       throw error;
     }
@@ -19,7 +20,7 @@ export const useApiStore = create((set) => ({
 
   sendImageScan: async (file) => {
     set({ isLoading: true, error: null });
-    try {
+    try{
       const formData = new FormData();
       formData.append("file", file);
       
@@ -28,7 +29,8 @@ export const useApiStore = create((set) => ({
       });
       set({ isLoading: false });
       return res;
-    } catch (error) {
+    } 
+    catch(error){
       set({ isLoading: false, error: error?.response?.data?.detail || error.message });
       throw error;
     }
@@ -36,7 +38,7 @@ export const useApiStore = create((set) => ({
 
   sendVoice: async (audioBlob) => {
     set({ isLoading: true, error: null });
-    try {
+    try{
       const formData = new FormData();
       formData.append("file", audioBlob, "voice.webm");
       
@@ -45,7 +47,8 @@ export const useApiStore = create((set) => ({
       });
       set({ isLoading: false });
       return res;
-    } catch (error) {
+    } 
+    catch(error){
       set({ isLoading: false, error: error?.response?.data?.detail || error.message });
       throw error;
     }
