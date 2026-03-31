@@ -1,100 +1,108 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useMemo } from 'react';
 import { RiSearchLine } from 'react-icons/ri';
 import { FaXmark } from 'react-icons/fa6';
 import { FaSearch } from 'react-icons/fa';
-import default1 from "../assets/default1.jpg"
-import { collection, getDoc, getDocs, query, where } from 'firebase/firestore';
-import { db } from '../firebase/firebase';
+import default1 from "../assets/default1.jpg";
+import { collection, getDocs, query, where, onSnapshot } from 'firebase/firestore';
+import { db, auth } from '../firebase/firebase';
+import { toast } from 'react-toastify';
 
 const SearchModal = ({ startChat }) => {
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [users, setUsers] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
 
-  const openModel = () => setIsModalOpen(true);
+  const openModel = () => {
+    setIsModalOpen(true);
+    toast.info("Type a username to search for users to chat with!");
+  };
   const closeModel = () => setIsModalOpen(false);
 
-  const handleSearch = async () => {
+  // Fetch all users once
+  useEffect(() => {
+    const usersRef = collection(db, "users");
+    const unsubscribe = onSnapshot(usersRef, (snapshot) => {
+      const usersList = snapshot.docs
+        .map((doc) => doc.data())
+        .filter((user) => user.uid !== auth.currentUser.uid && !user.isBot); // Exclude self and bots
+      setAllUsers(usersList);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Memoized filtered users
+  const filteredUsers = useMemo(() => {
     if (!searchTerm.trim()) {
-      window.alert("Please enter a name to search !!");
-      return;
+      return allUsers; // Show all users if search is empty
     }
-    try {
-      const normalizedSearchTerm = searchTerm.toLowerCase();
-      const q = query(
-        collection(db, "users"),
-        where("username", ">=", normalizedSearchTerm),
-        where("username", "<=", normalizedSearchTerm + "\uf8ff")
-      );
-
-      const querySnapshot = await getDocs(q);
-      const foundUsers = [];
-
-      querySnapshot.forEach((doc) => {
-        foundUsers.push(doc.data());
-      });
-      setUsers(foundUsers);
-
-      if (foundUsers.length === 0) {
-        alert("No user found !!");
-      }
-    }
-    catch (error) {
-      console.log(error);
-    }
-  }
+    return allUsers.filter(user =>
+      user.username.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [searchTerm, allUsers]);
 
   return (
     <div>
-      <button onClick={openModel} className="bg-primary/20 w-[35px] h-[35px] p-2 flex items-center justify-center rounded-lg ">
-        <RiSearchLine color="#8db87a" className="w-[18px] h-[18px] cursor-pointer " />
+      <button onClick={openModel} className="bg-muted w-[35px] h-[35px] p-2 flex items-center justify-center rounded-lg ">
+        <RiSearchLine className="w-[18px] h-[18px] cursor-pointer text-primary" />
       </button>
 
       {isModalOpen && (
-        <div onClick={closeModel} className="fixed inset-0 z-100 flex justify-center items-center bg-[#00170cb7]">
-          <div onClick={(e) => e.stopPropagation()} className="relative p-4 w-full max-w-md  max-h-full" >
-            <div className="relative bg-[#8db87a] w-[100%] rounded-md shadow-lg">
-              <div className="flex items-center justify-between p-4 md:p-5 border-b border-gray-300 border-opacity-30">
-                <h3 className="text-xl font-semibold text-[#0a0f0e]">Search Chat</h3>
-                <button onClick={closeModel} className="text-[#0a0f0e] bg-transparent hover:bg-[#0a0f0e]/10 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center">
+        <div onClick={closeModel} className="fixed inset-0 z-[100] flex justify-center items-center bg-black/60 backdrop-blur-sm">
+          <div onClick={(e) => e.stopPropagation()} className="relative p-4 w-full max-w-md max-h-full">
+            <div className="relative bg-card text-card-foreground w-[100%] rounded-lg shadow-xl border border-border">
+              <div className="flex items-center justify-between p-4 md:p-5 border-b border-border">
+                <h3 className="text-xl font-semibold">Search Chat</h3>
+                <button onClick={closeModel} className="text-muted-foreground bg-transparent hover:bg-muted rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center">
                   <FaXmark size={20} />
                 </button>
               </div>
               <div className="p-4 md:p-5">
                 <div className="space-y-4">
                   <div className="flex gap-3">
-                    <input onChange={(e) => setSearchTerm(e.target.value)} type="text" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg outline-none w-full p-2.5" placeholder="Search users" />
-                    <button onClick={handleSearch} className="bg-[#121a17] text-[#8db87a] px-3 py-2 rounded-lg">
+                    <input
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      type="text"
+                      className="bg-background border border-border text-foreground text-sm rounded-lg outline-none w-full p-2.5 focus:ring-2 focus:ring-primary"
+                      placeholder="Search users by username..."
+                    />
+                    <button className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:brightness-90 transition-all">
                       <FaSearch />
                     </button>
                   </div>
                 </div>
-                <div className="mt-6">
-                  {users?.map((user) => (
-                    <div onClick={() => {
-                      console.log(user);
-                      startChat(user);
-                      closeModel();
-                    }}
-                      className="flex items-start gap-3 bg-[#0a0f0e]/20 p-2 mb-3 rounded-lg cursor-pointer border border-[#ffffff20] shadow-sm ">
-                      <img src={user?.image || default1} className="h-[40px] w-[40px] rounded-full" alt="" />
-                      <span>
-                        <h2 className="p-0 font-semibold text-[#0a0f0e] text-[18px]">{user?.fullName}</h2>
-                        <p className="text-[13px] text-[#0a0f0e]">@{user?.username}</p>
-                      </span>
+                <div className="mt-6 h-[40vh] overflow-y-auto pr-2">
+                  {filteredUsers.length > 0 ? (
+                    filteredUsers.map((user) => (
+                      <div
+                        key={user.uid}
+                        onClick={() => {
+                          startChat(user);
+                          closeModel();
+                        }}
+                        className="flex items-center gap-3 hover:bg-muted p-2.5 mb-3 rounded-lg cursor-pointer border border-transparent hover:border-border transition-colors"
+                      >
+                        <img src={user?.image || default1} className="h-11 w-11 object-cover rounded-full" alt={user.username} />
+                        <span>
+                          <h2 className="p-0 font-semibold text-foreground text-lg">{user?.fullName}</h2>
+                          <p className="text-sm text-muted-foreground">@{user?.username}</p>
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center text-muted-foreground mt-10">
+                      <p>{searchTerm ? "No users found." : "No other users available."}</p>
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             </div>
           </div>
         </div>
-      )
-      }
-
-    </div >
-  )
-}
+      )}
+    </div>
+  );
+};
 
 export default SearchModal;
