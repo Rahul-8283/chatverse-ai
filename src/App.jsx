@@ -25,7 +25,7 @@ const App = () => {
             initializeAIBot();
         }
 
-        const unsubsribe = auth.onAuthStateChanged((user) => {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
             setUser(user);
             if (user) {
                 // Initialize AI Bot when user logs in
@@ -33,7 +33,7 @@ const App = () => {
             }
         });
 
-        return () => unsubsribe();
+        return () => unsubscribe();
     }, []);
 
     if (showSplash) {
@@ -85,7 +85,7 @@ const App = () => {
                 </div>
             ) : (
                 <div className="bg-background text-foreground h-screen">
-                    {isLogin ? ( <Login isLogin={isLogin} setIsLogin={setIsLogin} /> ) : ( <Register isLogin={isLogin} setIsLogin={setIsLogin} />) };
+                    {isLogin ? ( <Login isLogin={isLogin} setIsLogin={setIsLogin} /> ) : ( <Register isLogin={isLogin} setIsLogin={setIsLogin} />) }
                 </div>
             )}
         </div>

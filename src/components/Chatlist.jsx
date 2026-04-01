@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { RiMore2Fill } from 'react-icons/ri';
 import SearchModal from './SearchModal';
-import chatData from '../data/chats';
 import formatTimestamp from '../utils/formatTimestamp.js';
 import { auth, db, listenForChats } from '../firebase/firebase.js';
 import { onSnapshot, doc } from 'firebase/firestore';

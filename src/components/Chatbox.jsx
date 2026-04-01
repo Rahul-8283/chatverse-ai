@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import default1 from "../assets/default1.jpg";
 import formatTimestamp from '../utils/formatTimestamp.js';
 import { RiSendPlaneFill } from "react-icons/ri";
-import { messageData } from "../data/messageData.js";
 import { sendMessage } from '../firebase/firebase.js';
 import { auth } from '../firebase/firebase.js';
 import logo from "../assets/logo.png";
@@ -76,7 +75,7 @@ const Chatbox = ({ selectedUser }) => {
 
                 {sortedMessages?.map((msg, index) => (
                   <>
-                    {msg?.sender == senderEmail ? (
+                    {msg?.sender === senderEmail ? (
                       <div className="flex flex-col items-end w-full">
                         <span className="flex gap-3 h-auto ms-10 lg:me-7 me-2.5 mb-5">
                           <div>
