@@ -1,9 +1,10 @@
-import React from 'react'
-import logo from '../assets/logo.png'
-import { RiArrowDownSFill, RiMoonLine, RiSunLine, RiChatAiFill, RiChatAiLine, RiFile4Line, RiFolderUserLine, RiNotificationLine, RiShutDownLine } from "react-icons/ri";
+import React from 'react';
+import logo from '../assets/logo.png';
+import { RiMoonLine, RiSunLine, RiShutDownLine, RiSettings2Line } from "react-icons/ri";
 import { auth } from '../firebase/firebase';
 import { signOut } from 'firebase/auth';
 import { useTheme } from '../contexts/ThemeContext.jsx';
+import SettingsModal from './SettingsModal';
 
 const Navlinks = () => {
   const { theme, toggleTheme } = useTheme();
@@ -18,53 +19,38 @@ const Navlinks = () => {
   }
 
   return (
-    <section className="sticky lg:static top-0 flex items-center lg:items-start lg:justify-start h-[7vh] lg:h-[100vh] w-[100%] lg:w-[132px] py-8 lg:py-0 bg-primary text-primary-foreground transition-colors duration-300">
-      <main className="flex lg:flex-col items-center lg:gap-10 justify-between lg:px-0 w-[100%]  ">
-        <div className="flex items-start justify-center lg:border-b border-b-1 border-[#ffffffb9] lg:w-[100%] p-4">
-          <span className="flex items-center justify-center ">
-            <img src={logo} className="w-[56px] h-[52px] object-contain bg-white rounded-lg p-2" alt="" />
+    <section className="sticky lg:static top-0 flex items-center lg:items-start lg:justify-start h-[7vh] lg:h-[100vh] w-[100%] lg:w-[132px] py-8 lg:py-0 bg-primary text-primary-foreground transition-colors duration-300 z-50">
+      <main className="flex lg:flex-col items-center lg:gap-10 justify-between lg:px-0 w-[100%]">
+        <div className="flex items-start justify-center lg:border-b border-b-1 border-white/30 lg:w-[100%] p-4">
+          <span className="flex items-center justify-center">
+            <img src={logo} className="w-14 h-12 object-contain bg-white rounded-lg p-2" alt="ChatVerse Logo" />
           </span>
         </div>
 
-        <ul className="flex lg:flex-col flex-row items-center gap-7 md:gap-10 px-2 md:px-0">
-          <li className="">
-            <button className="lg:text-[28px] text-[22px] cursor-pointer">
-              <RiChatAiLine color="#fff" />
-            </button>
-          </li>
-          <li className="">
-            <button className="lg:text-[28px] text-[22px] cursor-pointer">
-              <RiFolderUserLine color="#fff" />
-            </button>
-          </li>
-          <li className="">
-            <button className="lg:text-[28px] text-[22px] cursor-pointer">
-              <RiNotificationLine color="#fff" />
-            </button>
-          </li>
-          <li className="">
-            <button className="lg:text-[28px] text-[22px] cursor-pointer">
-              <RiFile4Line color="#fff" />
-            </button>
-          </li>
-          <li className="">
-            <button onClick={toggleTheme} className="lg:text-[28px] text-[22px] cursor-pointer hover:text-[#121a17] transition-colors">
+        {/* Centered Icons */}
+        <ul className="flex lg:flex-col flex-row items-center justify-center flex-grow lg:gap-10 gap-7 px-2 md:px-0">
+          {/* Add functional icons here in the future */}
+        </ul>
+
+        {/* Bottom Icons */}
+        <ul className="flex lg:flex-col flex-row items-center lg:gap-8 gap-7 px-4 lg:pb-8">
+          <li>
+            <button onClick={toggleTheme} className="lg:text-[28px] text-[22px] cursor-pointer hover:text-white/80 transition-colors">
               {theme === 'dark' ? <RiSunLine color="#fff" /> : <RiMoonLine color="#fff" />}
             </button>
           </li>
-          <li className="">
-            <button onClick={handleLogout} className="lg:text-[28px] text-[22px] cursor-pointer">
+          <li>
+            <SettingsModal />
+          </li>
+          <li>
+            <button onClick={handleLogout} className="lg:text-[28px] text-[22px] cursor-pointer hover:text-red-400 transition-colors">
               <RiShutDownLine color="#fff" />
             </button>
           </li>
         </ul>
-        <button className="block lg:hidden lg:text-[28px] text-[22px] mr-[5px]">
-          <RiArrowDownSFill color="#fff" />
-        </button>
-
       </main>
     </section>
   )
 }
 
-export default Navlinks
+export default Navlinks;

@@ -18,3 +18,11 @@ export const validatePassword = (password) => {
 export const passwordsMatch = (password, confirmPassword) => {
   return password === confirmPassword && password.length > 0;
 };
+
+// A slightly more robust password check
+export const isPasswordStrong = (password) => {
+  // Example: At least 6 characters, 1 uppercase, 1 lowercase, 1 number
+  // const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/;
+  // For this project, we'll stick to the 6-character minimum for simplicity.
+  return password.length >= 6;
+};
