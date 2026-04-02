@@ -27,10 +27,9 @@ const AIChatbot = () => {
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
 
-  // Generate conversation ID based on date and persona
+  // Generate conversation ID based on persona
   useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
-    setConversationId(`${today}-${selectedPersona}`);
+    setConversationId(selectedPersona);
   }, [selectedPersona]);
 
   // Listen to Firestore messages
