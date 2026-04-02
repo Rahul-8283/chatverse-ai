@@ -25,7 +25,7 @@ const App = () => {
             initializeAIBot();
         }
 
-        const unsubsribe = auth.onAuthStateChanged((user) => {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
             setUser(user);
             if (user) {
                 // Initialize AI Bot when user logs in
@@ -33,7 +33,7 @@ const App = () => {
             }
         });
 
-        return () => unsubsribe();
+        return () => unsubscribe();
     }, []);
 
     if (showSplash) {
@@ -66,18 +66,26 @@ const App = () => {
                             <Chatbox selectedUser={selectedUser} />
                         )
                     ) : (
-                        <section className='h-[100vh] w-[100%] bg-background text-foreground '>
-                            <div className='flex flex-col justify-center items-center h-[100vh] '>
+                        <section className='min-h-screen w-[100%] bg-background text-foreground'>
+                            <div className='flex flex-col justify-center items-center min-h-screen px-4 py-8'>
                                 <img src={logo} alt="ChatVerse Logo" width={100} className="mb-5" />
-                                <h1 className="text-[30px] font-bold text-primary mt-5">Welcome to ChatVerse</h1>
-                                <p className="text-muted-foreground">Select a chat to get started or chat with our AI assistant</p>
+                                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mt-5 mb-3 text-center">Welcome to ChatVerse</h1>
+                                <p className="text-muted-foreground text-sm sm:text-base text-center max-w-md mb-8">Select a chat to get started or chat with our AI assistant</p>
+                                
+                                {/* Mobile Only Warning */}
+                                <div className="lg:hidden bg-green-50 dark:bg-green-900/40 border border-green-200 dark:border-green-700 rounded-lg p-4 max-w-md text-center">
+                                    <p className="text-xs sm:text-sm text-green-900 dark:text-green-100">
+                                        💻 <span className="font-semibold">Best Experience on Desktop</span><br />
+                                        This app is optimized for larger screens (PC, Laptop). For the best experience, please switch to a desktop device.
+                                    </p>
+                                </div>
                             </div>
                         </section>
                     )}
                 </div>
             ) : (
                 <div className="bg-background text-foreground h-screen">
-                    {isLogin ? ( <Login isLogin={isLogin} setIsLogin={setIsLogin} /> ) : ( <Register isLogin={isLogin} setIsLogin={setIsLogin} />) };
+                    {isLogin ? ( <Login isLogin={isLogin} setIsLogin={setIsLogin} /> ) : ( <Register isLogin={isLogin} setIsLogin={setIsLogin} />) }
                 </div>
             )}
         </div>
