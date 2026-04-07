@@ -18,11 +18,12 @@ export const useApiStore = create((set) => ({
     }
   },
 
-  sendImageScan: async (file) => {
+  sendImageScan: async (file, prompt = "Analyze and describe this image in detail.") => {
     set({ isLoading: true, error: null });
     try{
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("prompt", prompt);
       
       const res = await api.post("/api/image-scan", formData, {
         headers: { "Content-Type": "multipart/form-data" }

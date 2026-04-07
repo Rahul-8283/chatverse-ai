@@ -143,21 +143,28 @@ const AIChatbot = () => {
   const sendImage = async () => {
     if (!imageFile) return;
     
-    // Cache file and clear UI immediately so user doesn't wait
     const fileToSend = imageFile;
-    cancelImagePreview();
+    const userPrompt = messageText || "Analyze and describe this image in detail.";
     
+    // Save user message with image
+    const userMessageText = messageText ? `[IMAGE QUERY] ${messageText}` : "[IMAGE QUERY] Analyze this image";
+    
+    // Clear UI
+    cancelImagePreview();
+    setMessageText("");
     setIsLoading(true);
     
     try {
-      const base64Image = await getBase64(fileToSend);
+      // Save user message notification
       try {
-        await saveAIMessage(auth.currentUser.uid, conversationId, `[IMAGE]${base64Image}`, "user");
+        const base64Image = await getBase64(fileToSend);
+        await saveAIMessage(auth.currentUser.uid, conversationId, `[IMAGE]${base64Image}|${userPrompt}`, "user");
       } catch (e) {
-        await saveAIMessage(auth.currentUser.uid, conversationId, "[Image Attachment]", "user");
+        await saveAIMessage(auth.currentUser.uid, conversationId, `${userMessageText}`, "user");
       }
 
-      const res = await sendImageScan(fileToSend);
+      // Send to backend with user's prompt
+      const res = await sendImageScan(fileToSend, userPrompt);
       
       await saveAIMessage(auth.currentUser.uid, conversationId, res.data.reply, "ai");
     } catch (error) {
@@ -423,20 +430,20 @@ const AIChatbot = () => {
                     }
                   }
                 }}
-                disabled={isLoading || !conversationId || isRecording || imageFile !== null}
+                disabled={isLoading || !conversationId || isRecording}
                 type="text"
                 className="h-full text-foreground outline-none text-[16px] pl-2 pr-[45px] rounded-lg w-[100%] bg-transparent disabled:opacity-50"
                 placeholder={
                   isLoading ? "AI is thinking..." 
                   : isRecording ? "Recording audio..."
-                  : imageFile ? "Image attached (Add text not supported)"
+                  : imageFile ? "Add a question about the image..."
                   : "Ask me anything..."
                 }
               />
               
               <button
                 type="submit"
-                disabled={isLoading || !conversationId || (messageText.trim() === "" && !imageFile)}
+                disabled={isLoading || !conversationId || (messageText.trim() === "" && !imageFile) || (imageFile && messageText.trim() === "")}
                 className="flex items-center justify-center absolute right-2.5 p-2 rounded-md bg-muted hover:brightness-95 disabled:opacity-50"
               >
                 {isLoading ? (
