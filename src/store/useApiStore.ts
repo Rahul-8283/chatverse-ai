@@ -78,7 +78,7 @@ export const useApiStore = create<any>((set) => ({
     }
   },
 
-  ragChat: async (message: string, persona: string = "default") => {
+  ragChat: async (message: string, persona: string = "assistant") => {
     set({ isLoading: true, error: null });
     try {
       const idToken = await auth.currentUser?.getIdToken();
