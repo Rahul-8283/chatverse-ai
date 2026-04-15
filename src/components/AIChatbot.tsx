@@ -364,10 +364,10 @@ const AIChatbot = () => {
             </span>
             <span>
               <h3 className="font-semibold text-foreground text-lg">
-                {isRagMode ? "ChatVerse Analysis" : PERSONAS.find(p => p.id === selectedPersona).name}
+                {isRagMode ? `${PERSONAS.find(p => p.id === selectedPersona).name} Analysis` : PERSONAS.find(p => p.id === selectedPersona).name}
               </h3>
               <p className="font-light text-muted-foreground text-sm">
-                {isRagMode ? `${uploadedDocName || 'Upload documents for deep analysis'}` : "@chatverse-ai"}
+                @chatverse-ai
               </p>
             </span>
           </div>
@@ -528,12 +528,12 @@ const AIChatbot = () => {
               
               {isRagMode ? (
                 <>
-                  {/* Analysis Mode: + for documents, image for images, audio recording */}
+                  {/* Analysis Mode: + for documents, image for images, mic for audio */}
                   <button
                     type="button"
                     onClick={() => docInputRef.current?.click()}
                     disabled={isLoading}
-                    className="p-2.5 rounded-md mx-0.5 text-muted-foreground hover:bg-muted hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="p-2.5 rounded-md text-muted-foreground hover:bg-muted hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Upload documents (PDF)"
                   >
                     <FiPlus size={20} />
@@ -548,10 +548,27 @@ const AIChatbot = () => {
                   >
                     <FiImage size={20} />
                   </button>
+
+                  <button
+                    type="button"
+                    onClick={toggleRecording}
+                    disabled={isLoading}
+                    className={`p-2.5 rounded-md mx-0.5 transition-colors relative disabled:opacity-50 disabled:cursor-not-allowed ${
+                      isRecording 
+                        ? 'text-red-500' 
+                        : 'text-muted-foreground hover:bg-muted hover:text-primary'
+                    }`}
+                    title="Record audio"
+                  >
+                    {isRecording && (
+                      <span className="absolute inset-1.5 z-0 rounded-md bg-red-500 opacity-30 animate-ping"></span>
+                    )}
+                    <FiMic size={20} className="relative z-10" />
+                  </button>
                 </>
               ) : (
                 <>
-                  {/* Persona Mode: image icon */}
+                  {/* Persona Mode: image and mic icons */}
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
@@ -559,6 +576,22 @@ const AIChatbot = () => {
                     className="p-2.5 rounded-md mx-0.5 text-muted-foreground hover:bg-muted hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <FiImage size={20} />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={toggleRecording}
+                    disabled={isLoading || !conversationId}
+                    className={`p-2.5 rounded-md mx-0.5 transition-colors relative disabled:opacity-50 disabled:cursor-not-allowed ${
+                      isRecording 
+                        ? 'text-red-500' 
+                        : 'text-muted-foreground hover:bg-muted hover:text-primary'
+                    }`}
+                  >
+                    {isRecording && (
+                      <span className="absolute inset-1.5 z-0 rounded-md bg-red-500 opacity-30 animate-ping"></span>
+                    )}
+                    <FiMic size={20} className="relative z-10" />
                   </button>
                 </>
               )}
@@ -599,22 +632,6 @@ const AIChatbot = () => {
                       : "Message @ChatVerse-AI..."
                 }
               />
-
-              <button
-                type="button"
-                onClick={toggleRecording}
-                disabled={isLoading || (!isRagMode && !conversationId)}
-                className={`p-2.5 rounded-md mx-0.5 transition-colors relative disabled:opacity-50 disabled:cursor-not-allowed ${
-                  isRecording 
-                    ? 'text-red-500' 
-                    : 'text-muted-foreground hover:bg-muted hover:text-primary'
-                }`}
-              >
-                {isRecording && (
-                  <span className="absolute inset-1.5 z-0 rounded-md bg-red-500 opacity-30 animate-ping"></span>
-                )}
-                <FiMic size={20} className="relative z-10" />
-              </button>
 
               <button
                 type="submit"
