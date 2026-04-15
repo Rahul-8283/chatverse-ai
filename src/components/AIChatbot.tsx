@@ -25,7 +25,7 @@ const AIChatbot = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [isRagMode, setIsRagMode] = useState(false);
   const [uploadedDocName, setUploadedDocName] = useState("");
-  
+
   const fileInputRef = useRef(null);
   const docInputRef = useRef(null);
   const mediaRecorderRef = useRef(null);
@@ -79,9 +79,9 @@ const AIChatbot = () => {
   };
 
   const handleSendMessage = async (e?: any) => {
-    if(e) e.preventDefault();
+    if (e) e.preventDefault();
 
-    if(!messageText.trim()){
+    if (!messageText.trim()) {
       toast.error("Please type a message");
       return;
     }
@@ -143,10 +143,10 @@ const AIChatbot = () => {
   const handleImageSelect = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    
+
     if (!file.type.startsWith('image/')) {
-       toast.error("Please select an image file");
-       return;
+      toast.error("Please select an image file");
+      return;
     }
     setImageFile(file);
     setImagePreview(URL.createObjectURL(file));
@@ -155,23 +155,23 @@ const AIChatbot = () => {
   const cancelImagePreview = () => {
     setImageFile(null);
     setImagePreview(null);
-    if(fileInputRef.current) fileInputRef.current.value = "";
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const sendImage = async () => {
     if (!imageFile) return;
-    
+
     const fileToSend = imageFile;
     const userPrompt = messageText || "Analyze and describe this image in detail.";
-    
+
     // Save user message with image
     const userMessageText = messageText ? `[IMAGE QUERY] ${messageText}` : "[IMAGE QUERY] Analyze this image";
-    
+
     // Clear UI
     cancelImagePreview();
     setMessageText("");
     setIsLoading(true);
-    
+
     try {
       // Save user message notification
       try {
@@ -183,7 +183,7 @@ const AIChatbot = () => {
 
       // Send to backend with user's prompt
       const res = await sendImageScan(fileToSend, userPrompt);
-      
+
       await saveAIMessage(auth.currentUser.uid, conversationId, res.data.reply, "ai");
     } catch (error) {
       console.error(error);
@@ -207,8 +207,14 @@ const AIChatbot = () => {
       };
 
       mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        await sendVoiceMessage(audioBlob);
+        try {
+          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+          await sendVoiceMessage(audioBlob);
+        } finally {
+          // Stop stream tracks after sending is complete
+          mediaRecorderRef.current?.stream.getTracks().forEach(track => track.stop());
+          setIsRecording(false);
+        }
       };
 
       mediaRecorder.start();
@@ -222,47 +228,52 @@ const AIChatbot = () => {
   const handleStopRecording = () => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
       mediaRecorderRef.current.stop();
-      setIsRecording(false);
-      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+      // Don't stop tracks or set isRecording false here - let onstop callback handle it
     }
   };
 
   const toggleRecording = () => {
     if (isRecording) {
       handleStopRecording();
-    } else {
+    }
+    else {
       handleStartRecording();
     }
   };
 
   const sendVoiceMessage = async (audioBlob) => {
+    if (!auth.currentUser || !conversationId) {
+      toast.error("Not authenticated or conversation not ready");
+      return;
+    }
+
     setIsLoading(true);
     try {
       if (isRagMode) {
-        // RAG Mode: Send voice as RAG query
+        // Analysis Mode: Upload audio like a document
+        await uploadDocument(audioBlob);
+        await saveAIMessage(
+          auth.currentUser.uid,
+          conversationId,
+          `✅ Successfully uploaded audio. You can now ask questions about it.`,
+          "ai"
+        );
+      }
+      else {
+        // Persona Mode: Transcribe audio and send as text
         const res = await sendVoice(audioBlob);
         const transcript = res.data.transcript;
-        
-        const base64Audio = await getBase64(audioBlob);
-        try {
-          await saveAIMessage(auth.currentUser.uid, conversationId, `[AUDIO]${base64Audio}|${transcript}`, "user");
-        } catch (e) {
-          await saveAIMessage(auth.currentUser.uid, conversationId, `🎤 ${transcript}`, "user");
+
+        if (!transcript || transcript.trim() === "") {
+          toast.error("Could not transcribe audio. Please try again.");
+          return;
         }
 
-        const response = await ragChat(transcript, selectedPersona);
-        
-        await saveAIMessage(auth.currentUser.uid, conversationId, response, "ai");
-      } else {
-        // Persona Mode: Original voice handling
-        const res = await sendVoice(audioBlob);
-        const transcript = res.data.transcript;
-        
         const base64Audio = await getBase64(audioBlob);
         try {
           await saveAIMessage(auth.currentUser.uid, conversationId, `[AUDIO]${base64Audio}|${transcript}`, "user");
         } catch (e) {
-          await saveAIMessage(auth.currentUser.uid, conversationId, `[Voice Message]|${transcript}`, "user");
+          await saveAIMessage(auth.currentUser.uid, conversationId, `[Voice]: ${transcript}`, "user");
         }
 
         const historyForAPI = sortedMessages.map(msg => {
@@ -280,13 +291,12 @@ const AIChatbot = () => {
           history: historyForAPI,
           persona: selectedPersona
         });
-        
+
         await saveAIMessage(auth.currentUser.uid, conversationId, chatRes.data.reply, "ai");
       }
-      
     } catch (error) {
-      console.error(error);
-      toast.error("Failed to process voice message: " + (error?.response?.data?.detail || error.message));
+      console.error("Voice message error:", error);
+      toast.error("Failed to process voice: " + (error?.response?.data?.detail || error.message));
     } finally {
       setIsLoading(false);
     }
@@ -322,14 +332,14 @@ const AIChatbot = () => {
 
   const handleImageInRag = async () => {
     if (!imageFile || !auth.currentUser) return;
-    
+
     const prompt = messageText || "Analyze this image from the document.";
     const userMessageText = messageText ? `[IMAGE QUERY] ${messageText}` : "[IMAGE QUERY] Analyze this image";
     const fileToSend = imageFile;
     cancelImagePreview();
     setMessageText("");
     setIsLoading(true);
-    
+
     try {
       try {
         const base64Image = await getBase64(fileToSend);
@@ -339,9 +349,9 @@ const AIChatbot = () => {
       }
 
       await uploadDocument(fileToSend);
-      
+
       const response = await ragChat(prompt, selectedPersona);
-      
+
       await saveAIMessage(auth.currentUser.uid, conversationId, response, "ai");
     } catch (error) {
       toast.error(error?.response?.data?.detail || "Failed to process image");
@@ -371,7 +381,7 @@ const AIChatbot = () => {
               </p>
             </span>
           </div>
-          
+
           {/* RAG Mode Toggle */}
           <button
             onClick={() => {
@@ -381,11 +391,10 @@ const AIChatbot = () => {
               setImagePreview(null);
               setImageFile(null);
             }}
-            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-              isRagMode
+            className={`px-3 py-1.5 rounded-md mr-2 text-sm font-medium transition-colors ${isRagMode
                 ? 'bg-primary text-primary-foreground'
                 : 'bg-muted text-muted-foreground hover:bg-muted/80'
-            }`}
+              }`}
           >
             {isRagMode ? "Analysis" : "Analysis"}
           </button>
@@ -401,8 +410,8 @@ const AIChatbot = () => {
               <div className="flex flex-col items-center justify-center h-full text-center py-10">
                 <div className="text-6xl mb-4">{isRagMode ? "📄" : PERSONAS.find(p => p.id === selectedPersona).icon}</div>
                 <h2 className="text-2xl font-bold text-foreground mb-4 w-3/4 leading-relaxed">
-                  {isRagMode 
-                    ? "Upload documents for deep analysis or ask a question" 
+                  {isRagMode
+                    ? "Upload documents for deep analysis or ask a question"
                     : WELCOME_MSGS[selectedPersona]
                   }
                 </h2>
@@ -413,7 +422,7 @@ const AIChatbot = () => {
             {sortedMessages?.map((msg, index) => (
               <div
                 key={index}
-                className={msg?.sender  === "user" || msg?.role === "user" ? "flex flex-col items-end w-full mb-5" : "flex flex-col items-start w-full mb-5"}
+                className={msg?.sender === "user" || msg?.role === "user" ? "flex flex-col items-end w-full mb-5" : "flex flex-col items-start w-full mb-5"}
               >
                 {msg?.sender === "user" || msg?.role === "user" ? (
                   // User Message
@@ -465,7 +474,7 @@ const AIChatbot = () => {
                 </span>
               </div>
             )}
-            
+
           </div>
         </section>
 
@@ -477,11 +486,10 @@ const AIChatbot = () => {
               <button
                 key={p.id}
                 onClick={() => handlePersonaChange(p.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
-                  selectedPersona === p.id 
-                    ? 'bg-primary text-primary-foreground' 
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${selectedPersona === p.id
+                    ? 'bg-primary text-primary-foreground'
                     : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                }`}
+                  }`}
               >
                 <span>{p.icon}</span>
                 <span>{p.name}</span>
@@ -495,7 +503,7 @@ const AIChatbot = () => {
               <div className="relative inline-block">
                 <img src={imagePreview} className="h-16 rounded-md object-cover border border-border mt-1" />
                 <button onClick={cancelImagePreview} className="absolute -top-2 -right-2 bg-red-500/90 hover:bg-red-500 text-white shadow rounded-md p-1 z-10 transition-colors cursor-pointer">
-                  <FiX size={14}/>
+                  <FiX size={14} />
                 </button>
               </div>
             </div>
@@ -525,7 +533,7 @@ const AIChatbot = () => {
               {/* File inputs for all types */}
               <input type="file" accept=".pdf,.jpg,.jpeg,.png,.mp3,.wav" ref={docInputRef} onChange={(e) => e.target.files?.[0] && handleUploadFile(e.target.files[0])} className="hidden" />
               <input type="file" accept="image/*" ref={fileInputRef} onChange={isRagMode ? (e) => e.target.files?.[0] && handleUploadFile(e.target.files[0]) : handleImageSelect} className="hidden" />
-              
+
               {isRagMode ? (
                 <>
                   {/* Analysis Mode: + for documents, image for images, mic for audio */}
@@ -553,11 +561,10 @@ const AIChatbot = () => {
                     type="button"
                     onClick={toggleRecording}
                     disabled={isLoading}
-                    className={`p-2.5 rounded-md mx-0.5 transition-colors relative disabled:opacity-50 disabled:cursor-not-allowed ${
-                      isRecording 
-                        ? 'text-red-500' 
+                    className={`p-2.5 rounded-md mx-0.5 transition-colors relative disabled:opacity-50 disabled:cursor-not-allowed ${isRecording
+                        ? 'text-red-500'
                         : 'text-muted-foreground hover:bg-muted hover:text-primary'
-                    }`}
+                      }`}
                     title="Record audio"
                   >
                     {isRecording && (
@@ -582,11 +589,10 @@ const AIChatbot = () => {
                     type="button"
                     onClick={toggleRecording}
                     disabled={isLoading || !conversationId}
-                    className={`p-2.5 rounded-md mx-0.5 transition-colors relative disabled:opacity-50 disabled:cursor-not-allowed ${
-                      isRecording 
-                        ? 'text-red-500' 
+                    className={`p-2.5 rounded-md mx-0.5 transition-colors relative disabled:opacity-50 disabled:cursor-not-allowed ${isRecording
+                        ? 'text-red-500'
                         : 'text-muted-foreground hover:bg-muted hover:text-primary'
-                    }`}
+                      }`}
                   >
                     {isRecording && (
                       <span className="absolute inset-1.5 z-0 rounded-md bg-red-500 opacity-30 animate-ping"></span>
@@ -621,23 +627,23 @@ const AIChatbot = () => {
                 className="h-full text-foreground outline-none text-[16px] pl-2 pr-1 rounded-md w-[100%] bg-transparent disabled:opacity-50"
                 placeholder={
                   isRagMode
-                    ? isLoading ? "Processing..." 
+                    ? isLoading ? "Processing..."
                       : isRecording ? "Recording audio..."
-                      : imageFile ? "Ask about the image..."
-                      : uploadedDocName ? `Ask about "${uploadedDocName}"...`
-                      : "Search or ask a question..."
-                    : isLoading ? "AI is thinking..." 
+                        : imageFile ? "Ask about the image..."
+                          : uploadedDocName ? `Ask about "${uploadedDocName}"...`
+                            : "Search or ask a question..."
+                    : isLoading ? "AI is thinking..."
                       : isRecording ? "Recording audio..."
-                      : imageFile ? "Add a question about the image..."
-                      : "Message @ChatVerse-AI..."
+                        : imageFile ? "Add a question about the image..."
+                          : "Message @ChatVerse-AI..."
                 }
               />
 
               <button
                 type="submit"
                 disabled={
-                  isLoading || 
-                  isRecording || 
+                  isLoading ||
+                  isRecording ||
                   (!messageText.trim() && !imageFile) ||
                   (!isRagMode && !conversationId)
                 }
