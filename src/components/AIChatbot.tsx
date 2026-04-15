@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import { RiSendPlaneFill, RiLoader4Line } from "react-icons/ri";
 import { FiImage, FiMic, FiX, FiPlus } from "react-icons/fi";
+import RecordRTC from 'recordrtc';
 import { useApiStore } from '../store/useApiStore';
 import { saveAIMessage, listenForAIMessages } from '../firebase/firebase';
 import formatTimestamp from '../utils/formatTimestamp';
@@ -29,7 +30,6 @@ const AIChatbot = () => {
   const fileInputRef = useRef(null);
   const docInputRef = useRef(null);
   const mediaRecorderRef = useRef(null);
-  const audioChunksRef = useRef([]);
 
   // Generate conversation ID based on mode and persona
   useEffect(() => {
@@ -196,28 +196,17 @@ const AIChatbot = () => {
   const handleStartRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
-
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          audioChunksRef.current.push(e.data);
-        }
-      };
-
-      mediaRecorder.onstop = async () => {
-        try {
-          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-          await sendVoiceMessage(audioBlob);
-        } finally {
-          // Stop stream tracks after sending is complete
-          mediaRecorderRef.current?.stream.getTracks().forEach(track => track.stop());
-          setIsRecording(false);
-        }
-      };
-
-      mediaRecorder.start();
+      
+      // Use RecordRTC to capture audio as WAV format
+      const recorder = new RecordRTC(stream, {
+        type: 'audio',
+        mimeType: 'audio/wav',
+        recorderType: RecordRTC.StereoAudioRecorder,
+        desiredSampRate: 16000 // 16kHz for better speech recognition
+      });
+      
+      mediaRecorderRef.current = recorder;
+      recorder.startRecording();
       setIsRecording(true);
     } catch (error) {
       console.error("Microphone access denied", error);
@@ -226,10 +215,33 @@ const AIChatbot = () => {
   };
 
   const handleStopRecording = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-      mediaRecorderRef.current.stop();
-      // Don't stop tracks or set isRecording false here - let onstop callback handle it
-    }
+    if (!mediaRecorderRef.current) return;
+    
+    const recorder = mediaRecorderRef.current;
+    
+    recorder.stopRecording(() => {
+      try {
+        // Get WAV blob directly from RecordRTC
+        const wavBlob = recorder.getBlob();
+        
+        // Stop stream tracks
+        recorder.stream.getTracks().forEach(track => track.stop());
+        
+        // Send the WAV audio
+        sendVoiceMessage(wavBlob);
+      } catch (error) {
+        console.error("Error processing recording:", error);
+        toast.error("Failed to process recording");
+        setIsRecording(false);
+        try {
+          recorder.stream.getTracks().forEach(track => track.stop());
+        } catch (e) {
+          // Stream already stopped
+        }
+      } finally {
+        setIsRecording(false);
+      }
+    });
   };
 
   const toggleRecording = () => {
@@ -647,12 +659,12 @@ const AIChatbot = () => {
                   (!messageText.trim() && !imageFile) ||
                   (!isRagMode && !conversationId)
                 }
-                className="bg-primary text-primary-foreground rounded-md p-2.5 mx-0.5 disabled:bg-primary/50 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center justify-center absolute right-2.5 p-2 rounded-md bg-muted hover:brightness-95 disabled:opacity-50"
               >
                 {isLoading ? (
-                  <RiLoader4Line size={20} className="animate-spin" />
+                  <RiLoader4Line size={20} className="animate-spin text-primary" />
                 ) : (
-                  <RiSendPlaneFill size={20} />
+                  <RiSendPlaneFill className="text-primary" size={20} />
                 )}
               </button>
             </form>
