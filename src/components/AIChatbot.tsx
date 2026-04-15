@@ -358,15 +358,9 @@ const AIChatbot = () => {
         <main className='flex items-center justify-between '>
           <div className='flex items-center gap-3'>
             <span>
-              {isRagMode ? (
-                <div className="w-11 h-11 rounded-lg bg-primary flex items-center justify-center">
-                  <span className="text-primary-foreground font-bold text-lg">📄</span>
-                </div>
-              ) : (
-                <div className="w-11 h-11 rounded-lg bg-primary flex items-center justify-center">
-                  <span className="text-primary-foreground font-bold text-lg">{PERSONAS.find(p => p.id === selectedPersona).icon}</span>
-                </div>
-              )}
+              <div className="w-11 h-11 rounded-full bg-primary flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-lg">{PERSONAS.find(p => p.id === selectedPersona).icon}</span>
+              </div>
             </span>
             <span>
               <h3 className="font-semibold text-foreground text-lg">
