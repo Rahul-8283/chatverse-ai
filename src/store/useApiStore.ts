@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import api from '../config/axiosConfig';
+import { auth } from '../firebase/firebase';
 
 export const useApiStore = create<any>((set) => ({
   isLoading: false,
@@ -50,6 +51,50 @@ export const useApiStore = create<any>((set) => ({
       return res;
     } 
     catch(error){
+      set({ isLoading: false, error: error?.response?.data?.detail || error.message });
+      throw error;
+    }
+  },
+
+  uploadDocument: async (file) => {
+    set({ isLoading: true, error: null });
+    try {
+      const idToken = await auth.currentUser?.getIdToken();
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await api.post('/api/upload-document', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${idToken}`
+        }
+      });
+
+      set({ isLoading: false });
+      return res;
+    } catch (error: any) {
+      set({ isLoading: false, error: error?.response?.data?.detail || error.message });
+      throw error;
+    }
+  },
+
+  ragChat: async (message: string, persona: string = "default") => {
+    set({ isLoading: true, error: null });
+    try {
+      const idToken = await auth.currentUser?.getIdToken();
+
+      const res = await api.post('/api/rag-chat', {
+        query: message,
+        persona: persona
+      }, {
+        headers: {
+          'Authorization': `Bearer ${idToken}`
+        }
+      });
+
+      set({ isLoading: false });
+      return res.data.response;
+    } catch (error: any) {
       set({ isLoading: false, error: error?.response?.data?.detail || error.message });
       throw error;
     }
