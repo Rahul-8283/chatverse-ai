@@ -3,7 +3,7 @@ import logo from '../assets/logo.png';
 import { RiMoonLine, RiSunLine, RiShutDownLine, RiSettings2Line } from "react-icons/ri";
 import { auth } from '../firebase/firebase';
 import { signOut } from 'firebase/auth';
-import { useTheme } from '../contexts/ThemeContext.jsx';
+import { useTheme } from '../contexts/ThemeContext';
 import SettingsModal from './SettingsModal';
 
 const Navlinks = () => {

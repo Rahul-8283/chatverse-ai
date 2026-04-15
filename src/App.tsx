@@ -8,7 +8,7 @@ import Chatbox from "./components/Chatbox";
 import Chatlist from "./components/Chatlist";
 import AIChatbot from "./components/AIChatbot";
 import SplashScreen from "./components/SplashScreen";
-import { auth, db, initializeAIBot } from "./firebase/firebase.js";
+import { auth, db, initializeAIBot } from "./firebase/firebase";
 import logo from "./assets/logo.png";
 
 const App = () => {

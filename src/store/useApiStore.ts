@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import api from '../config/axiosConfig';
 
-export const useApiStore = create((set) => ({
+export const useApiStore = create<any>((set) => ({
   isLoading: false,
   error: null,
 

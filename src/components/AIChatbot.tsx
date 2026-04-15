@@ -6,7 +6,7 @@ import { useApiStore } from '../store/useApiStore';
 import { saveAIMessage, listenForAIMessages } from '../firebase/firebase';
 import formatTimestamp from '../utils/formatTimestamp';
 import { auth } from '../firebase/firebase';
-import { PERSONAS, WELCOME_MSGS, getBase64, formatMessage, renderUserContent } from '../utils/chatUtils.jsx';
+import { PERSONAS, WELCOME_MSGS, getBase64, formatMessage, renderUserContent } from '../utils/chatUtils';
 
 const AIChatbot = () => {
 
@@ -69,7 +69,7 @@ const AIChatbot = () => {
     setMessages([]); // Temporarily clear UI until firestore syncs
   };
 
-  const handleSendMessage = async (e) => {
+  const handleSendMessage = async (e?: any) => {
     if(e) e.preventDefault();
 
     if (!messageText.trim()) {

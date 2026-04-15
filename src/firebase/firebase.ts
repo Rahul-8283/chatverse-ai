@@ -4,7 +4,7 @@ import { getFirestore } from 'firebase/firestore';
 import { addDoc, collection, doc, getDoc, getDocs, onSnapshot, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  apiKey: (import.meta as any).env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
@@ -24,7 +24,7 @@ export const listenForChats = (setChats) => {
       id: doc.id,
       ...doc.data(),
     }));
-    const filteredChats = chatList.filter((chat) => chat?.users?.some((user) => user.email === auth.currentUser.email));
+    const filteredChats = chatList.filter((chat: any) => chat?.users?.some((user) => user.email === auth.currentUser.email));
 
     setChats(filteredChats);
   });
@@ -117,7 +117,7 @@ export const updateUserProfile = async (userId, updatedData) => {
   const allChatsSnapshot = await getDocs(collection(db, "chats"));
   const userChats = [];
   allChatsSnapshot.forEach((doc) => {
-    const chat = doc.data();
+    const chat = doc.data() as any;
     if (chat.users && chat.users.some(u => u.uid === userId)) {
       userChats.push({ id: doc.id, ...chat });
     }

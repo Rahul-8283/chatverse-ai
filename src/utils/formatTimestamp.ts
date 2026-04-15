@@ -1,11 +1,16 @@
-const formatTimestamp = (timestamp, showTime = false) => {
-    const defaultTimestamp = { seconds: 0, nanoseconds: 0 };
+interface Timestamp {
+    seconds: number;
+    nanoseconds: number;
+}
+
+const formatTimestamp = (timestamp: Timestamp | null, showTime = false): string => {
+    const defaultTimestamp: Timestamp = { seconds: 0, nanoseconds: 0 };
     const { seconds, nanoseconds } = timestamp || defaultTimestamp;
 
     const date = new Date(seconds * 1000 + nanoseconds / 1000000);
 
-    const dateOptions = { day: "numeric", month: "short", year: "numeric" };
-    const timeOptions = { hour: "2-digit", minute: "2-digit" };
+    const dateOptions: Intl.DateTimeFormatOptions = { day: "numeric", month: "short", year: "numeric" };
+    const timeOptions: Intl.DateTimeFormatOptions = { hour: "2-digit", minute: "2-digit" };
 
     const formattedDate = date.toLocaleDateString("en-US", dateOptions);
     const formattedTime = date.toLocaleTimeString("en-US", timeOptions);

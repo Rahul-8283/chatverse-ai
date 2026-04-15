@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import default1 from "../assets/default1.jpg";
-import formatTimestamp from '../utils/formatTimestamp.js';
+import formatTimestamp from '../utils/formatTimestamp';
 import { RiSendPlaneFill } from "react-icons/ri";
-import { sendMessage } from '../firebase/firebase.js';
-import { auth } from '../firebase/firebase.js';
+import { sendMessage } from '../firebase/firebase';
+import { auth } from '../firebase/firebase';
 import logo from "../assets/logo.png";
-import { listenForMessages } from '../firebase/firebase.js';
+import { listenForMessages } from '../firebase/firebase';
 
 const Chatbox = ({ selectedUser }) => {
   const [messages, setMessages] = useState([]);
@@ -108,7 +108,7 @@ const Chatbox = ({ selectedUser }) => {
             <div className="sticky lg:bottom-0 bottom-[60px] p-3 h-fit w-[100%] ">
               <form onSubmit={handleSendMessage} className="flex items-center bg-card h-[45px] w-[100%] px-2 rounded-lg relative shadow-lg ">
                 <input value={messageText} onChange={(e) => sendMessageText(e.target.value)} type="text" className="h-full text-foreground outline-none text-[16px] pl-3 pr-[40px] rounded-lg w-[100%] bg-transparent" name="" id="" placeholder="Write your message..." />
-                <button type="submit" action="submit" className="flex items-center justify-center absolute right-3 p-2 rounded-md bg-muted hover:brightness-95 text-primary ">
+                <button type="submit"  className="flex items-center justify-center absolute right-3 p-2 rounded-md bg-muted hover:brightness-95 text-primary ">
                   <RiSendPlaneFill className="text-primary" />
                 </button>
               </form>
