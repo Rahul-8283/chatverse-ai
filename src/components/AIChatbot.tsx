@@ -72,7 +72,7 @@ const AIChatbot = () => {
   const handleSendMessage = async (e?: any) => {
     if(e) e.preventDefault();
 
-    if (!messageText.trim()) {
+    if(!messageText.trim()){
       toast.error("Please type a message");
       return;
     }
