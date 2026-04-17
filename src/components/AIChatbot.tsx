@@ -488,7 +488,7 @@ const AIChatbot = () => {
             </span>
             <span>
               <h3 className="font-semibold text-foreground text-lg">
-                {isRagMode ? `${PERSONAS.find(p => p.id === selectedPersona).name} Analysis` : PERSONAS.find(p => p.id === selectedPersona).name}
+                {isRagMode ? "Document Analysis" : PERSONAS.find(p => p.id === selectedPersona).name}
               </h3>
               <p className="font-light text-muted-foreground text-sm">
                 @chatverse-ai
@@ -510,7 +510,7 @@ const AIChatbot = () => {
                 : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
           >
-            {isRagMode ? "Analysis" : "Analysis"}
+            {isRagMode ? "AI Analysis" : "AI Analysis"}
           </button>
         </main>
       </header>
