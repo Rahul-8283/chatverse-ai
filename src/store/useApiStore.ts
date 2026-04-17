@@ -78,14 +78,13 @@ export const useApiStore = create<any>((set) => ({
     }
   },
 
-  ragChat: async (message: string, persona: string = "assistant") => {
+  ragChat: async (message: string) => {
     set({ isLoading: true, error: null });
     try {
       const idToken = await auth.currentUser?.getIdToken();
 
       const res = await api.post('/api/rag-chat', {
         query: message,
-        persona: persona
       }, {
         headers: {
           'Authorization': `Bearer ${idToken}`

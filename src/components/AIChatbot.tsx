@@ -101,7 +101,7 @@ const AIChatbot = () => {
       );
 
       if (isRagMode) {
-        const response = await ragChat(userMessageText, selectedPersona);
+        const response = await ragChat(userMessageText);
         await saveAIMessage(
           auth.currentUser.uid,
           conversationId,
@@ -362,7 +362,7 @@ const AIChatbot = () => {
 
       await uploadDocument(fileToSend);
 
-      const response = await ragChat(prompt, selectedPersona);
+      const response = await ragChat(prompt);
 
       await saveAIMessage(auth.currentUser.uid, conversationId, response, "ai");
     } catch (error) {
@@ -492,22 +492,24 @@ const AIChatbot = () => {
 
         {/* Input Area Header Elements */}
         <div className="w-full flex-shrink-0 flex flex-col mt-auto bg-transparent pb-3 lg:pb-0 pt-2 lg:pt-0 z-10">
-          {/* Persona Switcher - Show in both modes */}
-          <div className="flex gap-2 overflow-x-auto p-2 pb-0 px-3 w-full scrollbar-hide">
-            {PERSONAS.map(p => (
-              <button
-                key={p.id}
-                onClick={() => handlePersonaChange(p.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${selectedPersona === p.id
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                  }`}
-              >
-                <span>{p.icon}</span>
-                <span>{p.name}</span>
-              </button>
-            ))}
-          </div>
+          {/* Persona Switcher - Show only in Persona mode (not in Analysis/RAG mode) */}
+          {!isRagMode && (
+            <div className="flex gap-2 overflow-x-auto p-2 pb-0 px-3 w-full scrollbar-hide">
+              {PERSONAS.map(p => (
+                <button
+                  key={p.id}
+                  onClick={() => handlePersonaChange(p.id)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${selectedPersona === p.id
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    }`}
+                >
+                  <span>{p.icon}</span>
+                  <span>{p.name}</span>
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Image Preview */}
           {imagePreview && (
