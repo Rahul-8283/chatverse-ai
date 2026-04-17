@@ -50,7 +50,7 @@ const SplashScreen = ({ onFinish }) => {
               className="mb-10 px-4 py-1.5 rounded-full border border-primary/30 bg-[#0a120e] flex items-center gap-2.5 backdrop-blur-sm shadow-[0_0_15px_rgba(141,184,122,0.1)]"
             >
               <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(141,184,122,0.8)]"></div>
-              <span className="text-gray-300 text-xs sm:text-sm font-bold tracking-[0.15em] uppercase">Powered by Gemini 2.5</span>
+              <span className="text-gray-300 text-xs sm:text-sm font-bold tracking-[0.15em] uppercase">Text - Voice - Vision AI</span>
             </motion.div>
 
             {/* Main Title */}
