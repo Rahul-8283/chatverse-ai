@@ -30,6 +30,9 @@ const AIChatbot = () => {
   const docInputRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
+  const streamRef = useRef(null);
+  const audioContextRef = useRef(null);
+  const processorRef = useRef(null);
 
   // Generate conversation ID based on mode
   useEffect(() => {
@@ -193,37 +196,142 @@ const AIChatbot = () => {
     }
   };
 
+  // Resample audio to 16kHz
+  const resampleAudio = (samples: Float32Array, originalSampleRate: number, targetSampleRate = 16000): Float32Array => {
+    if (originalSampleRate === targetSampleRate) {
+      return samples;
+    }
+    
+    const ratio = originalSampleRate / targetSampleRate;
+    const newLength = Math.round(samples.length / ratio);
+    const resampled = new Float32Array(newLength);
+    
+    let offsetResult = 0;
+    let offsetBuffer = 0;
+    
+    while (offsetResult < newLength) {
+      const nextOffsetBuffer = Math.round((offsetResult + 1) * ratio);
+      let accum = 0;
+      let count = 0;
+      
+      for (let i = offsetBuffer; i < nextOffsetBuffer && i < samples.length; i++) {
+        accum += samples[i];
+        count++;
+      }
+      
+      resampled[offsetResult] = accum / count;
+      offsetResult++;
+      offsetBuffer = nextOffsetBuffer;
+    }
+    
+    return resampled;
+  };
+
+  // WAV Encoder function
+  const encodeWAV = (samples: Float32Array, sampleRate = 16000) => {
+    const buffer = new ArrayBuffer(44 + samples.length * 2);
+    const view = new DataView(buffer);
+
+    // WAV header
+    const writeString = (offset: number, string: string) => {
+      for (let i = 0; i < string.length; i++) {
+        view.setUint8(offset + i, string.charCodeAt(i));
+      }
+    };
+
+    writeString(0, 'RIFF');
+    view.setUint32(4, 36 + samples.length * 2, true);
+    writeString(8, 'WAVE');
+    writeString(12, 'fmt ');
+    view.setUint32(16, 16, true); // Subchunk1Size
+    view.setUint16(20, 1, true); // PCM
+    view.setUint16(22, 1, true); // Mono
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 2, true); // Byte rate
+    view.setUint16(32, 2, true); // Block align
+    view.setUint16(34, 16, true); // Bits per sample
+    writeString(36, 'data');
+    view.setUint32(40, samples.length * 2, true);
+
+    let offset = 44;
+    for (let i = 0; i < samples.length; i++, offset += 2) {
+      const s = Math.max(-1, Math.min(1, samples[i]));
+      view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+    }
+
+    return buffer;
+  };
+
   const handleStartRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/wav' });
-      mediaRecorderRef.current = mediaRecorder;
+      streamRef.current = stream;
+
+      // Create audio context
+      const AudioContextClass = (window as any).AudioContext || (window as any).webkitAudioContext;
+      const audioContext = new AudioContextClass();
+      audioContextRef.current = audioContext;
+
+      const source = audioContext.createMediaStreamSource(stream);
+      const processor = audioContext.createScriptProcessor(4096, 1, 1);
+      processorRef.current = processor;
       audioChunksRef.current = [];
 
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          audioChunksRef.current.push(e.data);
-        }
+      processor.onaudioprocess = (e) => {
+        const samples = e.inputBuffer.getChannelData(0);
+        audioChunksRef.current.push(...Array.from(samples));
       };
 
-      mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-        await sendVoiceMessage(audioBlob);
-      };
+      source.connect(processor);
+      processor.connect(audioContext.destination);
 
-      mediaRecorder.start();
       setIsRecording(true);
     } catch (error) {
       console.error("Microphone access denied", error);
-      toast.error("Microphone access denied");
+      toast.error("Microphone access denied: " + error.message);
     }
   };
 
-  const handleStopRecording = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-      mediaRecorderRef.current.stop();
+  const handleStopRecording = async () => {
+    if (!audioContextRef.current || !processorRef.current) return;
+
+    try {
+      // Disconnect nodes
+      processorRef.current.disconnect();
+      
+      // Stop all tracks
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+      }
+
+      // Close audio context
+      if (audioContextRef.current) {
+        await audioContextRef.current.close();
+        audioContextRef.current = null;
+      }
+
       setIsRecording(false);
-      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+
+      // Resample and encode audio to WAV
+      if (audioChunksRef.current.length > 0) {
+        const audioContext = audioContextRef.current;
+        const sampleRate = audioContext?.sampleRate || 48000;
+        
+        // Convert array to Float32Array
+        const samplesArray = new Float32Array(audioChunksRef.current);
+        
+        // Resample to 16kHz
+        const resampledAudio = resampleAudio(samplesArray, sampleRate, 16000);
+        
+        // Encode to WAV
+        const wavBuffer = encodeWAV(resampledAudio, 16000);
+        const audioBlob = new Blob([wavBuffer], { type: 'audio/wav' });
+        await sendVoiceMessage(audioBlob);
+      }
+    } catch (error) {
+      console.error("Error stopping recording:", error);
+      toast.error("Error stopping recording: " + error.message);
     }
   };
 
