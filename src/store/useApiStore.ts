@@ -42,7 +42,7 @@ export const useApiStore = create<any>((set) => ({
     set({ isLoading: true, error: null });
     try{
       const formData = new FormData();
-      formData.append("file", audioBlob, "voice.webm");
+      formData.append("file", audioBlob, "voice.wav");
       
       const res = await api.post("/api/voice", formData, {
         headers: { "Content-Type": "multipart/form-data" }

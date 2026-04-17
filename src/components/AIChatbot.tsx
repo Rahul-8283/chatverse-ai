@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import { RiSendPlaneFill, RiLoader4Line } from "react-icons/ri";
 import { FiImage, FiMic, FiX, FiPlus } from "react-icons/fi";
-import RecordRTC from 'recordrtc';
 import { useApiStore } from '../store/useApiStore';
 import { saveAIMessage, listenForAIMessages } from '../firebase/firebase';
 import formatTimestamp from '../utils/formatTimestamp';
@@ -30,6 +29,7 @@ const AIChatbot = () => {
   const fileInputRef = useRef(null);
   const docInputRef = useRef(null);
   const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
 
   // Generate conversation ID based on mode
   useEffect(() => {
@@ -196,17 +196,22 @@ const AIChatbot = () => {
   const handleStartRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      
-      // Use RecordRTC to capture audio as WAV format
-      const recorder = new RecordRTC(stream, {
-        type: 'audio',
-        mimeType: 'audio/wav',
-        recorderType: RecordRTC.StereoAudioRecorder,
-        desiredSampRate: 16000 // 16kHz for better speech recognition
-      });
-      
-      mediaRecorderRef.current = recorder;
-      recorder.startRecording();
+      const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/wav' });
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          audioChunksRef.current.push(e.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+        await sendVoiceMessage(audioBlob);
+      };
+
+      mediaRecorder.start();
       setIsRecording(true);
     } catch (error) {
       console.error("Microphone access denied", error);
@@ -215,33 +220,11 @@ const AIChatbot = () => {
   };
 
   const handleStopRecording = () => {
-    if (!mediaRecorderRef.current) return;
-    
-    const recorder = mediaRecorderRef.current;
-    
-    recorder.stopRecording(() => {
-      try {
-        // Get WAV blob directly from RecordRTC
-        const wavBlob = recorder.getBlob();
-        
-        // Stop stream tracks
-        recorder.stream.getTracks().forEach(track => track.stop());
-        
-        // Send the WAV audio
-        sendVoiceMessage(wavBlob);
-      } catch (error) {
-        console.error("Error processing recording:", error);
-        toast.error("Failed to process recording");
-        setIsRecording(false);
-        try {
-          recorder.stream.getTracks().forEach(track => track.stop());
-        } catch (e) {
-          // Stream already stopped
-        }
-      } finally {
-        setIsRecording(false);
-      }
-    });
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+    }
   };
 
   const toggleRecording = () => {
