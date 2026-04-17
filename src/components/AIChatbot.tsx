@@ -128,7 +128,7 @@ const AIChatbot = () => {
         await saveAIMessage(
           auth.currentUser.uid,
           conversationId,
-          res.data.reply,
+          res.data.response,
           "ai"
         );
       }
