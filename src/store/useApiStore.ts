@@ -92,7 +92,7 @@ export const useApiStore = create<any>((set) => ({
       });
 
       set({ isLoading: false });
-      return res.data.response;
+      return res;
     } catch (error: any) {
       set({ isLoading: false, error: error?.response?.data?.detail || error.message });
       throw error;

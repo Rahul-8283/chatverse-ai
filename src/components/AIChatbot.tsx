@@ -31,11 +31,11 @@ const AIChatbot = () => {
   const docInputRef = useRef(null);
   const mediaRecorderRef = useRef(null);
 
-  // Generate conversation ID based on mode and persona
+  // Generate conversation ID based on mode
   useEffect(() => {
     if (isRagMode) {
-      // In Analysis mode, use persona-specific analysis conversations
-      setConversationId(`rag-${selectedPersona}`);
+      // In Analysis mode, use a single conversation ID for all RAG chats
+      setConversationId("rag-analysis");
     } else {
       setConversationId(selectedPersona);
     }
@@ -105,7 +105,7 @@ const AIChatbot = () => {
         await saveAIMessage(
           auth.currentUser.uid,
           conversationId,
-          response,
+          response.data.response,
           "ai"
         );
       } else {
@@ -184,7 +184,7 @@ const AIChatbot = () => {
       // Send to backend with user's prompt
       const res = await sendImageScan(fileToSend, userPrompt);
 
-      await saveAIMessage(auth.currentUser.uid, conversationId, res.data.reply, "ai");
+      await saveAIMessage(auth.currentUser.uid, conversationId, res.data.responsense, "ai");
     } catch (error) {
       console.error(error);
       toast.error("Failed to process image: " + (error?.response?.data?.detail || error.message));
@@ -304,7 +304,7 @@ const AIChatbot = () => {
           persona: selectedPersona
         });
 
-        await saveAIMessage(auth.currentUser.uid, conversationId, chatRes.data.reply, "ai");
+        await saveAIMessage(auth.currentUser.uid, conversationId, chatRes.data.responsense, "ai");
       }
     } catch (error) {
       console.error("Voice message error:", error);
