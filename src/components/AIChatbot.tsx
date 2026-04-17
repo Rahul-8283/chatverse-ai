@@ -245,14 +245,25 @@ const AIChatbot = () => {
     setIsLoading(true);
     try {
       if (isRagMode) {
-        // Analysis Mode: Upload audio like a document
-        await uploadDocument(audioBlob);
-        await saveAIMessage(
-          auth.currentUser.uid,
-          conversationId,
-          `✅ Successfully uploaded audio. You can now ask questions about it.`,
-          "ai"
-        );
+        // Analysis Mode: Transcribe audio first, then send to RAG
+        const res = await sendVoice(audioBlob);
+        const transcript = res.data.transcript;
+
+        if (!transcript || transcript.trim() === "") {
+          toast.error("Could not transcribe audio. Please try again.");
+          return;
+        }
+
+        const base64Audio = await getBase64(audioBlob);
+        try {
+          await saveAIMessage(auth.currentUser.uid, conversationId, `[AUDIO]${base64Audio}|${transcript}`, "user");
+        } catch (e) {
+          await saveAIMessage(auth.currentUser.uid, conversationId, `[Voice]: ${transcript}`, "user");
+        }
+
+        // Send transcript to RAG chat
+        const ragRes = await ragChat(transcript);
+        await saveAIMessage(auth.currentUser.uid, conversationId, ragRes.data.response, "ai");
       }
       else {
         // Persona Mode: Transcribe audio and send as text
@@ -287,7 +298,7 @@ const AIChatbot = () => {
           persona: selectedPersona
         });
 
-        await saveAIMessage(auth.currentUser.uid, conversationId, chatRes.data.responsense, "ai");
+        await saveAIMessage(auth.currentUser.uid, conversationId, chatRes.data.response, "ai");
       }
     } catch (error) {
       console.error("Voice message error:", error);
