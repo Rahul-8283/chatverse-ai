@@ -184,7 +184,7 @@ const AIChatbot = () => {
       // Send to backend with user's prompt
       const res = await sendImageScan(fileToSend, userPrompt);
 
-      await saveAIMessage(auth.currentUser.uid, conversationId, res.data.responsense, "ai");
+      await saveAIMessage(auth.currentUser.uid, conversationId, res.data.response, "ai");
     } catch (error) {
       console.error(error);
       toast.error("Failed to process image: " + (error?.response?.data?.detail || error.message));
@@ -358,7 +358,7 @@ const AIChatbot = () => {
 
       const response = await ragChat(prompt);
 
-      await saveAIMessage(auth.currentUser.uid, conversationId, response, "ai");
+      await saveAIMessage(auth.currentUser.uid, conversationId, response.data.response, "ai");
     } catch (error) {
       toast.error(error?.response?.data?.detail || "Failed to process image");
     } finally {
