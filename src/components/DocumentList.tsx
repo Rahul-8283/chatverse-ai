@@ -1,11 +1,38 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import { FiTrash2, FiFileText, FiImage, FiMusic, FiRefreshCw } from 'react-icons/fi';
 import { BiSolidFilePdf } from 'react-icons/bi';
+import { RiMore2Fill } from 'react-icons/ri';
 import useApiStore from '../store/useApiStore';
+import { auth, db } from '../firebase/firebase';
+import { onSnapshot, doc } from 'firebase/firestore';
+import default1 from "../assets/default1.jpg";
 
 const DocumentList = () => {
   const { documents, isLoading, isDeleting, fetchDocuments, deleteDocument, deleteAllDocuments } = useApiStore();
+  const [user, setUser] = useState(null);
+
+  // Fetch user data
+  useEffect(() => {
+    if (!auth.currentUser) return;
+    
+    const userDocRef = doc(db, "users", auth.currentUser.uid);
+    const unsubscribe = onSnapshot(userDocRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setUser(docSnap.data());
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Load documents on mount
+  useEffect(() => {
+    fetchDocuments().catch((error) => {
+      console.error('Error fetching documents:', error);
+      toast.error('Failed to load documents');
+    });
+  }, [fetchDocuments]);
 
   // Get file icon based on type
   const getFileIcon = (fileType: string) => {
@@ -26,14 +53,6 @@ const DocumentList = () => {
     if (fileType.includes('audio/wav')) return 'WAV';
     return 'File';
   };
-
-  // Load documents on mount
-  useEffect(() => {
-    fetchDocuments().catch((error) => {
-      console.error('Error fetching documents:', error);
-      toast.error('Failed to load documents');
-    });
-  }, [fetchDocuments]);
 
   const handleDeleteDocument = async (docId: string, docName: string) => {
     try {
@@ -62,91 +81,102 @@ const DocumentList = () => {
     }
   };
 
-  return (
-    <section className="relative hidden lg:flex flex-col bg-card border-r border-border h-screen w-[100%] md:w-[580px]">
-      {/* Header - Always Visible at Top */}
-      <div className="flex-shrink-0 p-4 border-b border-border">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-bold text-foreground">Documents</h2>
-          <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">
-            {documents.length}
-          </span>
-        </div>
+  const sortedDocuments = useMemo(() => {
+    return [...(documents || [])].sort((a, b) => {
+      const aTime = new Date(a.uploadedAt).getTime();
+      const bTime = new Date(b.uploadedAt).getTime();
+      return bTime - aTime;
+    });
+  }, [documents]);
 
-        {/* Delete All Button */}
-        {documents.length > 0 && (
-          <button
-            onClick={handleDeleteAllDocuments}
-            disabled={isLoading}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-md transition-colors disabled:opacity-50"
-            title="Delete all documents"
-          >
-            <FiTrash2 size={16} />
-            <span>Delete All</span>
-          </button>
-        )}
+  return (
+    <section className="relative hidden lg:flex flex-col item-start justify-start bg-card border-r border-border h-[100vh] w-[100%] md:w-[580px]">
+      <header className="flex items-center justify-between w-[100%] lg:border-b border-border p-4 sticky md:static top-0 z-[100] border-r">
+        <main className="flex items-center gap-3">
+          <img src={user?.image || default1} className="w-[44px] h-[44px] object-cover rounded-full" alt="temp" />
+          <span>
+            <h3 className="p-0 font-semibold text-foreground md:text-[17px]">{user?.fullName || "ChatVerse User"}</h3>
+            <p className="p-0 font-light text-muted-foreground text-[15px]">@{user?.username || "chatverse"}</p>
+          </span>
+        </main>
+        <button className="bg-muted w-[35px] h-[35px] flex items-center justify-center rounded-lg">
+          <RiMore2Fill className="w-[28px] h-[28px] cursor-pointer text-primary" />
+        </button>
+      </header>
+
+      <div className='w-[100%] mt-[10px] px-5'>
+        <header className='flex items-center justify-between'>
+          <h3 className='text-[16px]'>Documents ({documents?.length || 0})</h3>
+          {documents.length > 0 && (
+            <button
+              onClick={handleDeleteAllDocuments}
+              disabled={isLoading}
+              className="text-xs bg-red-500/10 text-red-500 hover:bg-red-500/20 px-2 py-1 rounded transition-colors disabled:opacity-50"
+              title="Delete all documents"
+            >
+              Delete All
+            </button>
+          )}
+        </header>
       </div>
 
-      {/* Documents List - Scrollable Content */}
-      <div className="flex-1 overflow-y-auto min-h-0 pb-[80px]">
+      <main className='flex flex-col items-start mt-[1.5rem] pb-20 flex-1 overflow-y-auto w-full'>
         {isLoading && documents.length === 0 ? (
-          <div className="flex items-center justify-center h-full">
+          <div className="w-full flex items-center justify-center py-8">
             <p className="text-muted-foreground text-sm">Loading documents...</p>
           </div>
         ) : documents.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full p-4 text-center">
-            <FiFileText size={40} className="text-muted-foreground/30 mb-2" />
+          <div className="w-full flex flex-col items-center justify-center py-12 px-4 text-center">
+            <FiFileText size={40} className="text-muted-foreground/30 mb-3" />
             <p className="text-muted-foreground text-sm">No documents uploaded yet</p>
             <p className="text-muted-foreground text-xs mt-1">Upload documents to get started</p>
           </div>
         ) : (
-          <ul className="space-y-1 p-2">
-            {documents.map(doc => (
-              <li
-                key={doc.id}
-                className="group flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors"
-              >
-                {/* File Icon */}
-                <div className="flex-shrink-0">
+          sortedDocuments.map((doc) => (
+            <button
+              key={doc.id}
+              className="flex items-start justify-between w-[100%] border-b border-border px-5 py-3 hover:bg-muted transition group"
+            >
+              <div className="flex items-start gap-3 flex-1 min-w-0">
+                <div className="flex-shrink-0 mt-1">
                   {getFileIcon(doc.type)}
                 </div>
-
-                {/* File Info */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">
+                <span className="min-w-0 flex-1">
+                  <h2 className="p-0 font-semibold text-foreground text-left text-[17px] truncate">
                     {doc.name}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
+                  </h2>
+                  <p className="p-0 font-light text-muted-foreground text-left text-[14px]">
                     {getFileTypeDisplay(doc.type)}
                   </p>
-                </div>
-
-                {/* Delete Button */}
-                <button
-                  onClick={() => handleDeleteDocument(doc.id, doc.name)}
-                  disabled={isDeleting[doc.id]}
-                  className="flex-shrink-0 p-1.5 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded opacity-0 group-hover:opacity-100 transition-all disabled:opacity-50"
-                  title="Delete document"
-                >
-                  {isDeleting[doc.id] ? (
-                    <div className="w-5 h-5 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <FiTrash2 size={18} />
-                  )}
-                </button>
-              </li>
-            ))}
-          </ul>
+                </span>
+              </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteDocument(doc.id, doc.name);
+                }}
+                disabled={isDeleting[doc.id]}
+                className="flex-shrink-0 ml-2 p-1.5 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded opacity-0 group-hover:opacity-100 transition-all disabled:opacity-50"
+                title="Delete document"
+              >
+                {isDeleting[doc.id] ? (
+                  <div className="w-5 h-5 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <FiTrash2 size={18} />
+                )}
+              </button>
+            </button>
+          ))
         )}
-      </div>
+      </main>
 
-      {/* Footer - Fixed Height at Bottom */}
-      <div className="absolute bottom-0 left-0 right-0 h-[70px] flex-shrink-0 p-3 border-t border-border bg-card">
+      {/* Footer - Refresh Button */}
+      <div className="absolute bottom-0 left-0 right-0 flex-shrink-0 p-3 border-t border-border bg-card md:static">
         {documents.length > 0 && (
           <button
             onClick={() => fetchDocuments()}
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-2 py-2 px-3 hover:bg-muted/50 rounded transition-colors disabled:opacity-50 text-sm text-muted-foreground hover:text-foreground"
+            className="w-full flex items-center justify-center gap-2 py-2 px-3 hover:bg-muted rounded transition-colors disabled:opacity-50 text-sm text-muted-foreground hover:text-foreground"
             title="Refresh documents"
           >
             <FiRefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
