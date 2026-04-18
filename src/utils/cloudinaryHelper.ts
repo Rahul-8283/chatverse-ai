@@ -61,12 +61,30 @@ export const uploadImageToCloudinary = async (file) => {
       throw new Error(`Upload failed with status: ${response.status}`);
     }
 
-    const data = await response.json();
+    let data;
+    try {
+      data = await response.json();
+    } catch (parseError) {
+      // ✅ Handle JSON parsing error
+      console.error("Error parsing Cloudinary response:", parseError);
+      toast.error("Invalid response from upload service.");
+      return null;
+    }
+
+    // ✅ Validate response has secure_url
+    if (!data?.secure_url) {
+      const errorMsg = data?.error?.message || "No URL returned from upload service.";
+      console.error("Cloudinary error:", errorMsg);
+      toast.error(errorMsg);
+      return null;
+    }
+
     return data.secure_url;
   } 
   catch(error){
-    console.error("Error uploading to Cloudinary:", error);
-    toast.error("Image upload failed. Please try again.");
+    const errorMsg = error instanceof Error ? error.message : "Image upload failed";
+    console.error("Error uploading to Cloudinary:", errorMsg);
+    toast.error(errorMsg + ". Please try again.");
     return null;
   }
 };

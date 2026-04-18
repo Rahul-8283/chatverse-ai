@@ -3,10 +3,10 @@ import { FaUserPlus } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { toast } from "react-toastify";
 import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import { auth, googleProvider, db } from "../firebase/firebase";
+import { auth, googleProvider, db } from "../firebase/firebase.ts";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { validateEmail, validateFullName, validatePassword, passwordsMatch } from '../utils/validation';
-import { useTheme } from '../contexts/ThemeContext';
+import { validateEmail, validateFullName, validatePassword, passwordsMatch } from '../utils/validation.ts';
+import { useTheme } from '../contexts/ThemeContext.tsx';
 import { RiMoonLine, RiSunLine } from "react-icons/ri";
 import { motion } from "framer-motion";
 
@@ -87,7 +87,7 @@ const Register = ({ isLogin, setIsLogin }) => {
             setUserData({ fullName: "", email: "", password: "", passwordConfirm: "" });
         }
         catch (error) {
-            console.log(error);
+            console.error(error);  // ✅ Changed from console.log to console.error
             if (error.code === "auth/email-already-in-use") {
                 toast.warning("This email is already registered. Please login instead");
             } else if (error.code === "auth/weak-password") {
@@ -122,7 +122,7 @@ const Register = ({ isLogin, setIsLogin }) => {
                 });
             }
         } catch (error) {
-            console.log(error);
+            console.error(error);  // ✅ Changed from console.log to console.error
             toast.error("Google sign-in failed. Please try again.");
         } finally {
             setIsLoading(false);

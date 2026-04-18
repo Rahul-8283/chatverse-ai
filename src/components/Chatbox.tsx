@@ -1,21 +1,30 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import default1 from "../assets/default1.jpg";
-import formatTimestamp from '../utils/formatTimestamp';
+import formatTimestamp from '../utils/formatTimestamp.ts';
 import { RiSendPlaneFill } from "react-icons/ri";
-import { sendMessage } from '../firebase/firebase';
-import { auth } from '../firebase/firebase';
+import { sendMessage } from '../firebase/firebase.ts';
+import { auth } from '../firebase/firebase.ts';
 import logo from "../assets/logo.png";
-import { listenForMessages } from '../firebase/firebase';
+import { listenForMessages } from '../firebase/firebase.ts';
 
 const Chatbox = ({ selectedUser }) => {
   const [messages, setMessages] = useState([]);
   const [messageText, sendMessageText] = useState("");
   const scrollRef = useRef(null);
 
-  const chatId = auth?.currentUser?.uid < selectedUser?.uid ? `${auth?.currentUser?.uid}-${selectedUser?.uid}` : `${selectedUser?.uid}-${auth?.currentUser?.uid}`;
-  const user1 = auth?.currentUser;
+  // ✅ Add explicit null checks before comparison
+  if (!auth?.currentUser?.uid || !selectedUser?.uid) {
+    return (
+      <section className="flex items-center justify-center h-full w-full">
+        <p className="text-muted-foreground">Loading chat...</p>
+      </section>
+    );
+  }
+
+  const chatId = auth.currentUser.uid < selectedUser.uid ? `${auth.currentUser.uid}-${selectedUser.uid}` : `${selectedUser.uid}-${auth.currentUser.uid}`;
+  const user1 = auth.currentUser;
   const user2 = selectedUser;
-  const senderEmail = auth?.currentUser?.email;
+  const senderEmail = auth.currentUser.email;
 
   useEffect(() => {
     listenForMessages(chatId, setMessages);

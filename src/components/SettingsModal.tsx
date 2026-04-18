@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { RiSettings2Line, RiCloseLine, RiImageAddLine, RiLockPasswordLine, RiUserUnfollowLine, RiCheckLine, RiLoader4Line, RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
 import { toast } from 'react-toastify';
-import { auth, db, updateUserProfile } from '../firebase/firebase';
+import { auth, db, updateUserProfile } from '../firebase/firebase.ts';
 import { onSnapshot, doc, deleteDoc } from 'firebase/firestore';
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword, deleteUser } from 'firebase/auth';
-import { useTheme } from '../contexts/ThemeContext';
-import { uploadImageToCloudinary } from '../utils/cloudinaryHelper';
+import { useTheme } from '../contexts/ThemeContext.tsx';
+import { uploadImageToCloudinary } from '../utils/cloudinaryHelper.ts';
 import default1 from "../assets/default1.jpg";
 
 const SettingsModal = () => {
@@ -46,7 +46,7 @@ const SettingsModal = () => {
       }
     });
     return () => unsubscribe();
-  }, [isModalOpen]);
+  }, []);  // ✅ Changed from [isModalOpen] to [] - only run on mount, not on modal open/close
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {

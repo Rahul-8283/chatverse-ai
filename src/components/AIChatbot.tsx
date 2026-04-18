@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import { RiSendPlaneFill, RiLoader4Line } from "react-icons/ri";
-import { FiImage, FiMic, FiX, FiPlus } from "react-icons/fi";
-import { useApiStore } from '../store/useApiStore';
-import { saveAIMessage, listenForAIMessages } from '../firebase/firebase';
-import formatTimestamp from '../utils/formatTimestamp';
-import { auth } from '../firebase/firebase';
-import { PERSONAS, WELCOME_MSGS, getBase64, formatMessage, renderUserContent } from '../utils/chatUtils';
+import { FiImage, FiMic, FiX, FiPlus, FiTrash2 } from "react-icons/fi";
+import { useApiStore } from '../store/useApiStore.ts';
+import { saveAIMessage, listenForAIMessages } from '../firebase/firebase.ts';
+import { auth } from '../firebase/firebase.ts';
+import formatTimestamp from '../utils/formatTimestamp.ts';
+import { PERSONAS, WELCOME_MSGS, getBase64, formatMessage, renderUserContent } from '../utils/chatUtils.tsx';
 
-const AIChatbot = () => {
+const AIChatbot = ({ isRagMode, setIsRagMode }) => {
 
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { sendChat, sendImageScan, sendVoice, uploadDocument, ragChat } = useApiStore();
+  const { sendChat, sendImageScan, sendVoice, uploadDocument, ragChat, deleteChat } = useApiStore();
   const [conversationId, setConversationId] = useState(null);
   const scrollRef = useRef(null);
   const unsubscribeRef = useRef(null);
@@ -23,7 +23,6 @@ const AIChatbot = () => {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
-  const [isRagMode, setIsRagMode] = useState(false);
   const [uploadedDocName, setUploadedDocName] = useState("");
 
   const fileInputRef = useRef(null);
@@ -79,6 +78,31 @@ const AIChatbot = () => {
   const handlePersonaChange = (personaId) => {
     setSelectedPersona(personaId);
     setMessages([]); // Temporarily clear UI until firestore syncs
+  };
+
+  const handleDeleteChat = async () => {
+    if (messages.length === 0) {
+      toast.info("No messages to delete");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Delete all ${messages.length} message(s) in this ${isRagMode ? "analysis" : "chat"}? This cannot be undone.`
+    );
+    if (!confirmed) return;
+
+    try {
+      setIsLoading(true);
+      await deleteChat(conversationId);
+      setMessages([]);
+      toast.success(`${isRagMode ? "Analysis" : "Chat"} deleted successfully`);
+    } catch (error: any) {
+      console.error('Error deleting chat:', error);
+      const errorMsg = error?.message || `Failed to delete ${isRagMode ? "analysis" : "chat"}`;
+      toast.error(errorMsg);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSendMessage = async (e?: any) => {
@@ -344,6 +368,26 @@ const AIChatbot = () => {
     }
   };
 
+  // ✅ Cleanup audio resources on component unmount
+  useEffect(() => {
+    return () => {
+      // Stop recording if still active
+      if (isRecording) {
+        try {
+          if (processorRef.current) processorRef.current.disconnect();
+          if (streamRef.current) {
+            streamRef.current.getTracks().forEach(track => track.stop());
+          }
+          if (audioContextRef.current) {
+            audioContextRef.current.close();
+          }
+        } catch (e) {
+          console.error("Error cleaning up audio:", e);
+        }
+      }
+    };
+  }, [isRecording]);
+
   const sendVoiceMessage = async (audioBlob) => {
     if (!auth.currentUser || !conversationId) {
       toast.error("Not authenticated or conversation not ready");
@@ -495,22 +539,13 @@ const AIChatbot = () => {
               </p>
             </span>
           </div>
-
-          {/* RAG Mode Toggle */}
           <button
-            onClick={() => {
-              setIsRagMode(!isRagMode);
-              setMessages([]);
-              setUploadedDocName("");
-              setImagePreview(null);
-              setImageFile(null);
-            }}
-            className={`px-3 py-1.5 rounded-md mr-2 text-sm font-medium transition-colors ${isRagMode
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted text-muted-foreground hover:bg-muted/80'
-              }`}
+            onClick={handleDeleteChat}
+            disabled={isLoading || messages.length === 0}
+            className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 mr-[10px] rounded-lg transition-colors disabled:opacity-50"
+            title={`Delete ${isRagMode ? "Document analysis" : "chat"}`}
           >
-            {isRagMode ? "AI Analysis" : "AI Analysis"}
+            <FiTrash2 size={20} />
           </button>
         </main>
       </header>

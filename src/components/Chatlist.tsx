@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { RiMore2Fill } from 'react-icons/ri';
-import SearchModal from './SearchModal';
-import formatTimestamp from '../utils/formatTimestamp';
-import { auth, db, listenForChats } from '../firebase/firebase';
+import SearchModal from './SearchModal.tsx';
+import HelpModal from './HelpModal.tsx';
+import formatTimestamp from '../utils/formatTimestamp.ts';
+import { auth, db, listenForChats } from '../firebase/firebase.ts';
 import { onSnapshot, doc } from 'firebase/firestore';
 import default1 from "../assets/default1.jpg";
 
@@ -10,34 +11,47 @@ const Chatlist = ({ setSelectedUser }) => {
   const [chats, setChats] = useState([]);
   const [user, setUser] = useState(null);
   const [aiBot, setAiBot] = useState(null);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   useEffect(() => {
-    const userDocRef = doc(db, "users", auth?.currentUser?.uid);
+    // ✅ Guard against auth not being initialized
+    if (!auth?.currentUser?.uid) return;
+    
+    const userDocRef = doc(db, "users", auth.currentUser.uid);
     const unsubscribe = onSnapshot(userDocRef, (doc) => {
-      setUser(doc.data());
+      if (doc.exists()) {
+        setUser(doc.data());
+      }
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [auth.currentUser?.uid]);  // ✅ Add auth dependency - re-run if user changes
 
   // Fetch AI Bot user
   useEffect(() => {
-    const fetchAIBot = async () => {
+    let unsubscribe;  // ✅ Store unsubscribe reference outside async
+    
+    const setupAIBot = async () => {
       try {
         const aiBotRef = doc(db, "users", "ai-assistant-bot");
-        const unsubscribe = onSnapshot(aiBotRef, (doc) => {
+        unsubscribe = onSnapshot(aiBotRef, (doc) => {
           if (doc.exists()) {
             setAiBot(doc.data());
           }
         });
-
-        return () => unsubscribe();
       } catch (error) {
         console.error("Error fetching AI Bot:", error);
       }
     };
 
-    fetchAIBot();
+    setupAIBot();
+    
+    // ✅ Return cleanup directly from useEffect - React will call this on unmount
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -71,7 +85,9 @@ const Chatlist = ({ setSelectedUser }) => {
             <p className="p-0 font-light text-muted-foreground text-[15px]">@{user?.username || "chatverse"}</p>
           </span>
         </main>
-        <button className="bg-muted w-[35px] h-[35px] flex items-center justify-center rounded-lg">
+        <button 
+          onClick={() => setIsHelpOpen(true)}
+          className="bg-muted w-[35px] h-[35px] flex items-center justify-center rounded-lg hover:bg-muted/80 transition-colors">
           <RiMore2Fill className="w-[28px] h-[28px] cursor-pointer text-primary" />
         </button>
       </header>
@@ -125,6 +141,10 @@ const Chatlist = ({ setSelectedUser }) => {
               ))}
           </button>
         ))}
+
+      {isHelpOpen && (
+        <HelpModal onClose={() => setIsHelpOpen(false)} />
+      )}
       </main>
     </section>
   )
