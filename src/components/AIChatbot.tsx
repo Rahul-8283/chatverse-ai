@@ -96,9 +96,10 @@ const AIChatbot = ({ isRagMode, setIsRagMode }) => {
       await deleteChat(conversationId);
       setMessages([]);
       toast.success(`${isRagMode ? "Analysis" : "Chat"} deleted successfully`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting chat:', error);
-      toast.error(`Failed to delete ${isRagMode ? "analysis" : "chat"}`);
+      const errorMsg = error?.message || `Failed to delete ${isRagMode ? "analysis" : "chat"}`;
+      toast.error(errorMsg);
     } finally {
       setIsLoading(false);
     }

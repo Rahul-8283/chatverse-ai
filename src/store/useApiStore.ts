@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import api from '../config/axiosConfig';
-import { auth, deleteAIConversation } from '../firebase/firebase';
+import { auth } from '../firebase/firebase';
 
 export const useApiStore = create<any>((set) => ({
   isLoading: false,
@@ -168,14 +168,29 @@ export const useApiStore = create<any>((set) => ({
   deleteChat: async (conversationId: string) => {
     set({ isLoading: true, error: null });
     try {
-      const userId = auth.currentUser?.uid;
-      if (!userId) throw new Error("User not authenticated");
+      const idToken = await auth.currentUser?.getIdToken();
+      if (!idToken) {
+        throw new Error("User not authenticated");
+      }
       
-      await deleteAIConversation(userId, conversationId);
+      if (!conversationId) {
+        throw new Error("Conversation ID not provided");
+      }
+      
+      console.log(`🗑️ Attempting to delete conversation: ${conversationId}`);
+      const res = await api.delete(`/api/chat/${conversationId}`, {
+        headers: {
+          'Authorization': `Bearer ${idToken}`
+        }
+      });
+      
       set({ isLoading: false });
-      return { success: true, message: "Chat deleted successfully" };
+      console.log(`✅ Successfully deleted conversation: ${conversationId}`);
+      return res.data;
     } catch (error: any) {
-      set({ isLoading: false, error: error?.message || "Failed to delete chat" });
+      console.error(`❌ Error deleting chat:`, error);
+      const errorMessage = error?.response?.data?.detail || error?.message || "Failed to delete chat";
+      set({ isLoading: false, error: errorMessage });
       throw error;
     }
   }
