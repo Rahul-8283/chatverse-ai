@@ -2,10 +2,10 @@ import React from 'react';
 import logo from '../assets/logo.png';
 import { RiMoonLine, RiSunLine, RiShutDownLine, RiSettings2Line } from "react-icons/ri";
 import { FiFileText, FiMessageCircle } from "react-icons/fi";
-import { auth } from '../firebase/firebase';
+import { auth } from '../firebase/firebase.ts';
 import { signOut } from 'firebase/auth';
-import { useTheme } from '../contexts/ThemeContext';
-import SettingsModal from './SettingsModal';
+import { useTheme } from '../contexts/ThemeContext.tsx';
+import SettingsModal from './SettingsModal.tsx';
 
 const Navlinks = ({ isRagMode, setIsRagMode }) => {
   const { theme, toggleTheme } = useTheme();

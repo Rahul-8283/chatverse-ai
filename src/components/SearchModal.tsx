@@ -4,7 +4,7 @@ import { FaXmark } from 'react-icons/fa6';
 import { FaSearch } from 'react-icons/fa';
 import default1 from "../assets/default1.jpg";
 import { collection, getDocs, query, where, onSnapshot } from 'firebase/firestore';
-import { db, auth } from '../firebase/firebase';
+import { db, auth } from '../firebase/firebase.ts';
 import { toast } from 'react-toastify';
 
 const SearchModal = ({ startChat }) => {

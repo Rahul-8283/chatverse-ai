@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import { RiSendPlaneFill, RiLoader4Line } from "react-icons/ri";
 import { FiImage, FiMic, FiX, FiPlus, FiTrash2 } from "react-icons/fi";
-import { useApiStore } from '../store/useApiStore';
-import { saveAIMessage, listenForAIMessages } from '../firebase/firebase';
-import { auth } from '../firebase/firebase';
-import formatTimestamp from '../utils/formatTimestamp';
-import { PERSONAS, WELCOME_MSGS, getBase64, formatMessage, renderUserContent } from '../utils/chatUtils';
+import { useApiStore } from '../store/useApiStore.ts';
+import { saveAIMessage, listenForAIMessages } from '../firebase/firebase.ts';
+import { auth } from '../firebase/firebase.ts';
+import formatTimestamp from '../utils/formatTimestamp.ts';
+import { PERSONAS, WELCOME_MSGS, getBase64, formatMessage, renderUserContent } from '../utils/chatUtils.tsx';
 
 const AIChatbot = ({ isRagMode, setIsRagMode }) => {
 

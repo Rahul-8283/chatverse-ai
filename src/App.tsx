@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Login from "./components/Login";
-import Register from "./components/Register";
-import Navlinks from "./components/Navlinks";
-import Chatbox from "./components/Chatbox";
-import Chatlist from "./components/Chatlist";
-import DocumentList from "./components/DocumentList";
-import AIChatbot from "./components/AIChatbot";
-import SplashScreen from "./components/SplashScreen";
-import { auth, db, initializeAIBot } from "./firebase/firebase";
+import Login from "./components/Login.tsx";
+import Register from "./components/Register.tsx";
+import Navlinks from "./components/Navlinks.tsx";
+import Chatbox from "./components/Chatbox.tsx";
+import Chatlist from "./components/Chatlist.tsx";
+import DocumentList from "./components/DocumentList.tsx";
+import AIChatbot from "./components/AIChatbot.tsx";
+import SplashScreen from "./components/SplashScreen.tsx";
+import { auth, db, initializeAIBot } from "./firebase/firebase.ts";
 import logo from "./assets/logo.png";
 
 const App = () => {

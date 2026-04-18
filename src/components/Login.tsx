@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { FaSignInAlt } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { toast } from "react-toastify";
-import { auth, googleProvider, db } from '../firebase/firebase';
+import { auth, googleProvider, db } from '../firebase/firebase.ts';
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { validateEmail } from '../utils/validation';
-import { useTheme } from '../contexts/ThemeContext';
+import { validateEmail } from '../utils/validation.ts';
+import { useTheme } from '../contexts/ThemeContext.tsx';
 import { RiMoonLine, RiSunLine } from "react-icons/ri";
 import { motion } from "framer-motion";
 

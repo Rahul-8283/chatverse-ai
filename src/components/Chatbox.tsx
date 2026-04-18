@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import default1 from "../assets/default1.jpg";
-import formatTimestamp from '../utils/formatTimestamp';
+import formatTimestamp from '../utils/formatTimestamp.ts';
 import { RiSendPlaneFill } from "react-icons/ri";
-import { sendMessage } from '../firebase/firebase';
-import { auth } from '../firebase/firebase';
+import { sendMessage } from '../firebase/firebase.ts';
+import { auth } from '../firebase/firebase.ts';
 import logo from "../assets/logo.png";
-import { listenForMessages } from '../firebase/firebase';
+import { listenForMessages } from '../firebase/firebase.ts';
 
 const Chatbox = ({ selectedUser }) => {
   const [messages, setMessages] = useState([]);

@@ -3,10 +3,10 @@ import { FaUserPlus } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { toast } from "react-toastify";
 import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import { auth, googleProvider, db } from "../firebase/firebase";
+import { auth, googleProvider, db } from "../firebase/firebase.ts";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { validateEmail, validateFullName, validatePassword, passwordsMatch } from '../utils/validation';
-import { useTheme } from '../contexts/ThemeContext';
+import { validateEmail, validateFullName, validatePassword, passwordsMatch } from '../utils/validation.ts';
+import { useTheme } from '../contexts/ThemeContext.tsx';
 import { RiMoonLine, RiSunLine } from "react-icons/ri";
 import { motion } from "framer-motion";
 

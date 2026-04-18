@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { RiMore2Fill } from 'react-icons/ri';
-import SearchModal from './SearchModal';
-import formatTimestamp from '../utils/formatTimestamp';
-import { auth, db, listenForChats } from '../firebase/firebase';
+import SearchModal from './SearchModal.tsx';
+import formatTimestamp from '../utils/formatTimestamp.ts';
+import { auth, db, listenForChats } from '../firebase/firebase.ts';
 import { onSnapshot, doc } from 'firebase/firestore';
 import default1 from "../assets/default1.jpg";
 

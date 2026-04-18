@@ -3,8 +3,8 @@ import { toast } from 'react-toastify';
 import { FiTrash2, FiFileText, FiImage, FiMusic, FiRefreshCw } from 'react-icons/fi';
 import { BiSolidFilePdf } from 'react-icons/bi';
 import { RiMore2Fill } from 'react-icons/ri';
-import useApiStore from '../store/useApiStore';
-import { auth, db } from '../firebase/firebase';
+import useApiStore from '../store/useApiStore.ts';
+import { auth, db } from '../firebase/firebase.ts';
 import { onSnapshot, doc } from 'firebase/firestore';
 import default1 from "../assets/default1.jpg";
 

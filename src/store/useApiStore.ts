@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import api from '../config/axiosConfig';
-import { auth } from '../firebase/firebase';
+import api from '../config/axiosConfig.ts';
+import { auth } from '../firebase/firebase.ts';
 
 export const useApiStore = create<any>((set) => ({
   isLoading: false,
