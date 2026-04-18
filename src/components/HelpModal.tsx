@@ -18,7 +18,7 @@ const HelpModal = ({ onClose }: { onClose?: () => void }) => {
     },
     {
       icon: <RiFileTextLine className="w-6 h-6" />,
-      title: "Document Analysis (RAG)",
+      title: "Document Analysis",
       description: "Upload documents and ask questions about them. The AI will analyze and provide context-aware answers from your files."
     },
     {
@@ -140,28 +140,11 @@ const HelpModal = ({ onClose }: { onClose?: () => void }) => {
               <section className="bg-primary/5 border border-primary/20 rounded-lg p-4">
                 <h4 className="font-semibold text-foreground mb-2">💡 Pro Tips</h4>
                 <ul className="text-sm text-muted-foreground space-y-2">
-                  <li>• Double-click on chat names to rename them locally</li>
                   <li>• Use specific AI personalities for different conversation types</li>
-                  <li>• Upload documents for context-aware AI responses (RAG mode)</li>
+                  <li>• Upload documents for context-aware AI responses</li>
                   <li>• Check your settings regularly for the best experience</li>
                   <li>• The AI respects your privacy - all conversations are encrypted</li>
                 </ul>
-              </section>
-
-              {/* Support Section */}
-              <section className="bg-muted/30 rounded-lg p-4 border border-border">
-                <h4 className="font-semibold text-foreground mb-2">Need More Help?</h4>
-                <p className="text-sm text-muted-foreground mb-3">
-                  For additional support, questions, or feedback, please reach out to our support team.
-                </p>
-                <div className="flex gap-2">
-                  <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm">
-                    Contact Support
-                  </button>
-                  <button className="px-4 py-2 border border-border rounded-lg hover:bg-muted transition-colors font-medium text-sm">
-                    Documentation
-                  </button>
-                </div>
               </section>
             </div>
           </motion.div>
