@@ -32,7 +32,7 @@ The system follows a modern decoupled architecture:
 - **AI Memory (RAG):** Pinecone (Vector DB) for semantic search and Supabase for persistent file storage.
 - **Real-time Engine:** Firebase Firestore for instant P2P messaging and authentication.
 
-<img width="100%" alt="Architecture Flow" src="../Eraser_FlowDiagram.png" />
+<img width="100%" alt="Architecture Flow" src="./images/diagram.png" />
 
 ---
 
