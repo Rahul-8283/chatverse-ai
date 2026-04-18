@@ -61,6 +61,7 @@ const App = () => {
                     <Navlinks isRagMode={isRagMode} setIsRagMode={setIsRagMode} />
                     {isRagMode ? <DocumentList /> : <Chatlist setSelectedUser={setSelectedUser} />}
                     {/* Routing Logic: If RAG mode, show AIChatbot. Otherwise show based on selectedUser */}
+                    {/* HIGH LEVEL LOGIC : ONLY HUMAN WITH MORE BRAIN CAN UNDERSTAND..... */}
                     {isRagMode ? (
                         <AIChatbot isRagMode={isRagMode} setIsRagMode={setIsRagMode} />
                     ) : selectedUser ? (
