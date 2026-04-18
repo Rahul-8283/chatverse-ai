@@ -36,6 +36,12 @@ The system follows a modern decoupled architecture:
 
 ---
 
+## 🔗 Related Repositories
+
+- **Backend**: [ChatVerse AI Backend](https://github.com/Rahul-8283/chatverse-ai-backend)
+
+---
+
 ## ✨ Key Features
 
 ### 🧠 Retrieval-Augmented Generation (RAG)
@@ -136,6 +142,8 @@ FIREBASE_PRIVATE_KEY_ID=your_firebase_private_key_id
 
 ---
 
-## 🔗 Project Links
-- **Frontend Repository:** [ChatVerse AI Frontend](https://github.com/Rahul-8283/chatverse-ai)
-- **Backend Repository:** [ChatVerse AI Backend](https://github.com/Rahul-8283/chatverse-ai-backend)
+## 📄 License
+
+This project is licensed under the MIT License. See [LICENSE](./LICENSE) file for details.
+
+---
