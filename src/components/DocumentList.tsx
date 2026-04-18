@@ -106,7 +106,17 @@ const DocumentList = () => {
 
       <div className='w-[100%] mt-[10px] px-5'>
         <header className='flex items-center justify-between'>
-          <h3 className='text-[16px]'>Documents ({documents?.length || 0})</h3>
+          <div className='flex items-center gap-2'>
+            <h3 className='text-[16px]'>Documents ({documents?.length || 0})</h3>
+            <button
+              onClick={() => fetchDocuments()}
+              disabled={isLoading}
+              className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors disabled:opacity-50"
+              title="Refresh documents"
+            >
+              <FiRefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
+            </button>
+          </div>
           {documents.length > 0 && (
             <button
               onClick={handleDeleteAllDocuments}
@@ -120,7 +130,7 @@ const DocumentList = () => {
         </header>
       </div>
 
-      <main className='flex flex-col items-start mt-[1.5rem] pb-20 flex-1 overflow-y-auto w-full'>
+      <main className='flex flex-col items-start mt-[1.5rem] flex-1 overflow-y-auto w-full'>
         {isLoading && documents.length === 0 ? (
           <div className="w-full flex items-center justify-center py-8">
             <p className="text-muted-foreground text-sm">Loading documents...</p>
@@ -169,21 +179,6 @@ const DocumentList = () => {
           ))
         )}
       </main>
-
-      {/* Footer - Refresh Button */}
-      <div className="absolute bottom-0 left-0 right-0 flex-shrink-0 p-3 border-t border-border bg-card md:static">
-        {documents.length > 0 && (
-          <button
-            onClick={() => fetchDocuments()}
-            disabled={isLoading}
-            className="w-full flex items-center justify-center gap-2 py-2 px-3 hover:bg-muted rounded transition-colors disabled:opacity-50 text-sm text-muted-foreground hover:text-foreground"
-            title="Refresh documents"
-          >
-            <FiRefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
-            <span>Refresh</span>
-          </button>
-        )}
-      </div>
     </section>
   );
 };
