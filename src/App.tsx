@@ -16,6 +16,7 @@ const App = () => {
     const [user, setUser] = useState(null);
     const [selectedUser, setSelectedUser] = useState(null);
     const [showSplash, setShowSplash] = useState(true);
+    const [isRagMode, setIsRagMode] = useState(false);
 
     useEffect(() => {
         const currentUser = auth.currentUser;
@@ -56,12 +57,12 @@ const App = () => {
             />
             {user ? (
                 <div className="flex flex-col lg:flex-row items-start width-[100%]">
-                    <Navlinks />
+                    <Navlinks isRagMode={isRagMode} setIsRagMode={setIsRagMode} />
                     <Chatlist setSelectedUser={setSelectedUser} />
                     {/* Routing Logic: Show AIChatbot or Chatbox based on selectedUser */}
                     {selectedUser ? (
                         selectedUser?.uid === "ai-assistant-bot" ? (
-                            <AIChatbot />
+                            <AIChatbot isRagMode={isRagMode} setIsRagMode={setIsRagMode} />
                         ) : (
                             <Chatbox selectedUser={selectedUser} />
                         )

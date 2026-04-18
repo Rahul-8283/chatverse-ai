@@ -1,12 +1,13 @@
 import React from 'react';
 import logo from '../assets/logo.png';
 import { RiMoonLine, RiSunLine, RiShutDownLine, RiSettings2Line } from "react-icons/ri";
+import { FiFileText, FiMessageCircle } from "react-icons/fi";
 import { auth } from '../firebase/firebase';
 import { signOut } from 'firebase/auth';
 import { useTheme } from '../contexts/ThemeContext';
 import SettingsModal from './SettingsModal';
 
-const Navlinks = () => {
+const Navlinks = ({ isRagMode, setIsRagMode }) => {
   const { theme, toggleTheme } = useTheme();
 
   const handleLogout = async () => {
@@ -29,7 +30,16 @@ const Navlinks = () => {
 
         {/* Centered Icons */}
         <ul className="flex lg:flex-col flex-row items-center justify-center flex-grow lg:gap-10 gap-7 px-2 md:px-0">
-          {/* Add functional icons here in the future */}
+          {/* Document/Chat Toggle */}
+          <li>
+            <button 
+              onClick={() => setIsRagMode(!isRagMode)}
+              className="lg:text-[28px] text-[22px] cursor-pointer hover:text-white/80 transition-colors"
+              title={isRagMode ? "Switch to Chat" : "Switch to Document Analysis"}
+            >
+              {isRagMode ? <FiMessageCircle color="#fff" /> : <FiFileText color="#fff" />}
+            </button>
+          </li>
         </ul>
 
         {/* Bottom Icons */}

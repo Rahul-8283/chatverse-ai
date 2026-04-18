@@ -8,7 +8,7 @@ import formatTimestamp from '../utils/formatTimestamp';
 import { auth } from '../firebase/firebase';
 import { PERSONAS, WELCOME_MSGS, getBase64, formatMessage, renderUserContent } from '../utils/chatUtils';
 
-const AIChatbot = () => {
+const AIChatbot = ({ isRagMode, setIsRagMode }) => {
 
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
@@ -23,7 +23,6 @@ const AIChatbot = () => {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
-  const [isRagMode, setIsRagMode] = useState(false);
   const [uploadedDocName, setUploadedDocName] = useState("");
 
   const fileInputRef = useRef(null);
@@ -495,23 +494,6 @@ const AIChatbot = () => {
               </p>
             </span>
           </div>
-
-          {/* RAG Mode Toggle */}
-          <button
-            onClick={() => {
-              setIsRagMode(!isRagMode);
-              setMessages([]);
-              setUploadedDocName("");
-              setImagePreview(null);
-              setImageFile(null);
-            }}
-            className={`px-3 py-1.5 rounded-md mr-2 text-sm font-medium transition-colors ${isRagMode
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted text-muted-foreground hover:bg-muted/80'
-              }`}
-          >
-            {isRagMode ? "AI Analysis" : "AI Analysis"}
-          </button>
         </main>
       </header>
 
