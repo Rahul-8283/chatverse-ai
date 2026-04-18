@@ -24,22 +24,29 @@ const Chatlist = ({ setSelectedUser }) => {
 
   // Fetch AI Bot user
   useEffect(() => {
-    const fetchAIBot = async () => {
+    let unsubscribe;  // ✅ Store unsubscribe reference outside async
+    
+    const setupAIBot = async () => {
       try {
         const aiBotRef = doc(db, "users", "ai-assistant-bot");
-        const unsubscribe = onSnapshot(aiBotRef, (doc) => {
+        unsubscribe = onSnapshot(aiBotRef, (doc) => {
           if (doc.exists()) {
             setAiBot(doc.data());
           }
         });
-
-        return () => unsubscribe();
       } catch (error) {
         console.error("Error fetching AI Bot:", error);
       }
     };
 
-    fetchAIBot();
+    setupAIBot();
+    
+    // ✅ Return cleanup directly from useEffect - React will call this on unmount
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, []);
 
   useEffect(() => {

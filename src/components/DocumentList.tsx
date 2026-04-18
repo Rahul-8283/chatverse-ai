@@ -30,11 +30,13 @@ const DocumentList = () => {
 
   // Load documents on mount
   useEffect(() => {
+    if (!auth.currentUser) return;  // ✅ Auth check - prevent crash on logout
+    
     fetchDocuments().catch((error) => {
       console.error('Error fetching documents:', error);
       toast.error('Failed to load documents');
     });
-  }, [fetchDocuments]);
+  }, []);  // ✅ Removed fetchDocuments from deps - prevent infinite loop
 
   // Get file icon based on type
   const getFileIcon = (fileType: string) => {
