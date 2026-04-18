@@ -4,8 +4,8 @@ import { RiSendPlaneFill, RiLoader4Line } from "react-icons/ri";
 import { FiImage, FiMic, FiX, FiPlus, FiTrash2 } from "react-icons/fi";
 import { useApiStore } from '../store/useApiStore';
 import { saveAIMessage, listenForAIMessages } from '../firebase/firebase';
-import formatTimestamp from '../utils/formatTimestamp';
 import { auth } from '../firebase/firebase';
+import formatTimestamp from '../utils/formatTimestamp';
 import { PERSONAS, WELCOME_MSGS, getBase64, formatMessage, renderUserContent } from '../utils/chatUtils';
 
 const AIChatbot = ({ isRagMode, setIsRagMode }) => {
