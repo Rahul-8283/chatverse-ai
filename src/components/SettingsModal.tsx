@@ -46,7 +46,7 @@ const SettingsModal = () => {
       }
     });
     return () => unsubscribe();
-  }, [isModalOpen]);
+  }, []);  // ✅ Changed from [isModalOpen] to [] - only run on mount, not on modal open/close
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {

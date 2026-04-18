@@ -46,7 +46,7 @@ const Login = ({ isLogin, setIsLogin }) => {
             await signInWithEmailAndPassword(auth, userData?.email, userData?.password);
         }
         catch (error) {
-            console.log(error);
+            console.error(error);  // ✅ Changed from console.log to console.error
             if (error.code === "auth/user-not-found") {
                 toast.error("No account found with this email");
             } else if (error.code === "auth/wrong-password") {
@@ -81,7 +81,7 @@ const Login = ({ isLogin, setIsLogin }) => {
                 });
             }
         } catch (error) {
-            console.log(error);
+            console.error(error);  // ✅ Changed from console.log to console.error
             toast.error("Google sign-in failed. Please try again.");
         } finally {
             setIsLoading(false);
