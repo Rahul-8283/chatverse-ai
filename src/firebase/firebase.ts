@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
-import { addDoc, collection, doc, getDoc, getDocs, onSnapshot, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, getDocs, onSnapshot, serverTimestamp, setDoc, updateDoc, deleteDoc } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: (import.meta as any).env.VITE_FIREBASE_API_KEY,
@@ -220,6 +220,30 @@ export const listenForAIMessages = (userId, conversationId, setMessages) => {
     return unsubscribe;
   } catch (error) {
     console.error("Error setting up AI messages listener:", error);
+    throw error;
+  }
+};
+
+/**
+ * Delete an AI conversation and all its messages
+ */
+export const deleteAIConversation = async (userId, conversationId) => {
+  try {
+    const messageRef = collection(db, "ai-chats", userId, "conversations", conversationId, "messages");
+    const messageSnapshot = await getDocs(messageRef);
+    
+    // Delete all messages in the conversation
+    for (const messageDoc of messageSnapshot.docs) {
+      await deleteDoc(doc(db, "ai-chats", userId, "conversations", conversationId, "messages", messageDoc.id));
+    }
+    
+    // Delete the conversation document itself
+    const conversationRef = doc(db, "ai-chats", userId, "conversations", conversationId);
+    await deleteDoc(conversationRef);
+    
+    console.log(`✅ Deleted conversation '${conversationId}' completely for user ${userId}`);
+  } catch (error) {
+    console.error("Error deleting AI conversation:", error);
     throw error;
   }
 };

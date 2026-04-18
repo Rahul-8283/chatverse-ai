@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import { RiSendPlaneFill, RiLoader4Line } from "react-icons/ri";
-import { FiImage, FiMic, FiX, FiPlus } from "react-icons/fi";
+import { FiImage, FiMic, FiX, FiPlus, FiTrash2 } from "react-icons/fi";
 import { useApiStore } from '../store/useApiStore';
 import { saveAIMessage, listenForAIMessages } from '../firebase/firebase';
 import formatTimestamp from '../utils/formatTimestamp';
@@ -13,7 +13,7 @@ const AIChatbot = ({ isRagMode, setIsRagMode }) => {
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { sendChat, sendImageScan, sendVoice, uploadDocument, ragChat } = useApiStore();
+  const { sendChat, sendImageScan, sendVoice, uploadDocument, ragChat, deleteChat } = useApiStore();
   const [conversationId, setConversationId] = useState(null);
   const scrollRef = useRef(null);
   const unsubscribeRef = useRef(null);
@@ -78,6 +78,30 @@ const AIChatbot = ({ isRagMode, setIsRagMode }) => {
   const handlePersonaChange = (personaId) => {
     setSelectedPersona(personaId);
     setMessages([]); // Temporarily clear UI until firestore syncs
+  };
+
+  const handleDeleteChat = async () => {
+    if (messages.length === 0) {
+      toast.info("No messages to delete");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Delete all ${messages.length} message(s) in this ${isRagMode ? "analysis" : "chat"}? This cannot be undone.`
+    );
+    if (!confirmed) return;
+
+    try {
+      setIsLoading(true);
+      await deleteChat(conversationId);
+      setMessages([]);
+      toast.success(`${isRagMode ? "Analysis" : "Chat"} deleted successfully`);
+    } catch (error) {
+      console.error('Error deleting chat:', error);
+      toast.error(`Failed to delete ${isRagMode ? "analysis" : "chat"}`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSendMessage = async (e?: any) => {
@@ -494,6 +518,14 @@ const AIChatbot = ({ isRagMode, setIsRagMode }) => {
               </p>
             </span>
           </div>
+          <button
+            onClick={handleDeleteChat}
+            disabled={isLoading || messages.length === 0}
+            className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 mr-[10px] rounded-lg transition-colors disabled:opacity-50"
+            title={`Delete ${isRagMode ? "Document analysis" : "chat"}`}
+          >
+            <FiTrash2 size={20} />
+          </button>
         </main>
       </header>
 

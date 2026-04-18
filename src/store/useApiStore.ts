@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import api from '../config/axiosConfig';
-import { auth } from '../firebase/firebase';
+import { auth, deleteAIConversation } from '../firebase/firebase';
 
 export const useApiStore = create<any>((set) => ({
   isLoading: false,
@@ -161,6 +161,21 @@ export const useApiStore = create<any>((set) => ({
       return res.data;
     } catch (error: any) {
       set({ isLoading: false, error: error?.response?.data?.detail || error.message });
+      throw error;
+    }
+  },
+
+  deleteChat: async (conversationId: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const userId = auth.currentUser?.uid;
+      if (!userId) throw new Error("User not authenticated");
+      
+      await deleteAIConversation(userId, conversationId);
+      set({ isLoading: false });
+      return { success: true, message: "Chat deleted successfully" };
+    } catch (error: any) {
+      set({ isLoading: false, error: error?.message || "Failed to delete chat" });
       throw error;
     }
   }
