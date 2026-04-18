@@ -6,6 +6,7 @@ import Register from "./components/Register";
 import Navlinks from "./components/Navlinks";
 import Chatbox from "./components/Chatbox";
 import Chatlist from "./components/Chatlist";
+import DocumentList from "./components/DocumentList";
 import AIChatbot from "./components/AIChatbot";
 import SplashScreen from "./components/SplashScreen";
 import { auth, db, initializeAIBot } from "./firebase/firebase";
@@ -58,7 +59,7 @@ const App = () => {
             {user ? (
                 <div className="flex flex-col lg:flex-row items-start width-[100%]">
                     <Navlinks isRagMode={isRagMode} setIsRagMode={setIsRagMode} />
-                    <Chatlist setSelectedUser={setSelectedUser} />
+                    {isRagMode ? <DocumentList /> : <Chatlist setSelectedUser={setSelectedUser} />}
                     {/* Routing Logic: Show AIChatbot or Chatbox based on selectedUser */}
                     {selectedUser ? (
                         selectedUser?.uid === "ai-assistant-bot" ? (
