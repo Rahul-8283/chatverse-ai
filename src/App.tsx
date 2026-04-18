@@ -60,8 +60,10 @@ const App = () => {
                 <div className="flex flex-col lg:flex-row items-start width-[100%]">
                     <Navlinks isRagMode={isRagMode} setIsRagMode={setIsRagMode} />
                     {isRagMode ? <DocumentList /> : <Chatlist setSelectedUser={setSelectedUser} />}
-                    {/* Routing Logic: Show AIChatbot or Chatbox based on selectedUser */}
-                    {selectedUser ? (
+                    {/* Routing Logic: If RAG mode, show AIChatbot. Otherwise show based on selectedUser */}
+                    {isRagMode ? (
+                        <AIChatbot isRagMode={isRagMode} setIsRagMode={setIsRagMode} />
+                    ) : selectedUser ? (
                         selectedUser?.uid === "ai-assistant-bot" ? (
                             <AIChatbot isRagMode={isRagMode} setIsRagMode={setIsRagMode} />
                         ) : (
