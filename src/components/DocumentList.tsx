@@ -110,10 +110,10 @@ const DocumentList = () => {
           <button
             onClick={() => fetchDocuments()}
             disabled={isLoading}
-            className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors disabled:opacity-50"
+            className="bg-muted w-[35px] h-[35px] p-2 flex items-center justify-center rounded-lg transition-colors disabled:opacity-50"
             title="Refresh documents"
           >
-            <FiRefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
+            <FiRefreshCw size={18} className={`text-primary ${isLoading ? 'animate-spin' : ''}`} />
           </button>
         </header>
       </div>
