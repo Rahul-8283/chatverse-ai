@@ -14,13 +14,18 @@ const Chatlist = ({ setSelectedUser }) => {
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   useEffect(() => {
-    const userDocRef = doc(db, "users", auth?.currentUser?.uid);
+    // ✅ Guard against auth not being initialized
+    if (!auth?.currentUser?.uid) return;
+    
+    const userDocRef = doc(db, "users", auth.currentUser.uid);
     const unsubscribe = onSnapshot(userDocRef, (doc) => {
-      setUser(doc.data());
+      if (doc.exists()) {
+        setUser(doc.data());
+      }
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [auth.currentUser?.uid]);  // ✅ Add auth dependency - re-run if user changes
 
   // Fetch AI Bot user
   useEffect(() => {

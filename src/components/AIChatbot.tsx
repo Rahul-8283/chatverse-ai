@@ -368,6 +368,26 @@ const AIChatbot = ({ isRagMode, setIsRagMode }) => {
     }
   };
 
+  // ✅ Cleanup audio resources on component unmount
+  useEffect(() => {
+    return () => {
+      // Stop recording if still active
+      if (isRecording) {
+        try {
+          if (processorRef.current) processorRef.current.disconnect();
+          if (streamRef.current) {
+            streamRef.current.getTracks().forEach(track => track.stop());
+          }
+          if (audioContextRef.current) {
+            audioContextRef.current.close();
+          }
+        } catch (e) {
+          console.error("Error cleaning up audio:", e);
+        }
+      }
+    };
+  }, [isRecording]);
+
   const sendVoiceMessage = async (audioBlob) => {
     if (!auth.currentUser || !conversationId) {
       toast.error("Not authenticated or conversation not ready");

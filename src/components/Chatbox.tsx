@@ -12,10 +12,19 @@ const Chatbox = ({ selectedUser }) => {
   const [messageText, sendMessageText] = useState("");
   const scrollRef = useRef(null);
 
-  const chatId = auth?.currentUser?.uid < selectedUser?.uid ? `${auth?.currentUser?.uid}-${selectedUser?.uid}` : `${selectedUser?.uid}-${auth?.currentUser?.uid}`;
-  const user1 = auth?.currentUser;
+  // ✅ Add explicit null checks before comparison
+  if (!auth?.currentUser?.uid || !selectedUser?.uid) {
+    return (
+      <section className="flex items-center justify-center h-full w-full">
+        <p className="text-muted-foreground">Loading chat...</p>
+      </section>
+    );
+  }
+
+  const chatId = auth.currentUser.uid < selectedUser.uid ? `${auth.currentUser.uid}-${selectedUser.uid}` : `${selectedUser.uid}-${auth.currentUser.uid}`;
+  const user1 = auth.currentUser;
   const user2 = selectedUser;
-  const senderEmail = auth?.currentUser?.email;
+  const senderEmail = auth.currentUser.email;
 
   useEffect(() => {
     listenForMessages(chatId, setMessages);
