@@ -104,29 +104,17 @@ const DocumentList = () => {
         </button>
       </header>
 
-      <div className='w-[100%] mt-[10px] px-5'>
-        <header className='flex items-center justify-between'>
-          <div className='flex items-center gap-2'>
-            <h3 className='text-[16px]'>Documents ({documents?.length || 0})</h3>
-            <button
-              onClick={() => fetchDocuments()}
-              disabled={isLoading}
-              className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors disabled:opacity-50"
-              title="Refresh documents"
-            >
-              <FiRefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
-            </button>
-          </div>
-          {documents.length > 0 && (
-            <button
-              onClick={handleDeleteAllDocuments}
-              disabled={isLoading}
-              className="text-xs bg-red-500/10 text-red-500 hover:bg-red-500/20 px-2 py-1 rounded transition-colors disabled:opacity-50"
-              title="Delete all documents"
-            >
-              Delete All
-            </button>
-          )}
+      <div className='w-[100%] mt-[10px] px-5 '>
+        <header className='flex items-center justify-between  '>
+          <h3 className='text-[16px]'>Documents ({documents?.length || 0})</h3>
+          <button
+            onClick={() => fetchDocuments()}
+            disabled={isLoading}
+            className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors disabled:opacity-50"
+            title="Refresh documents"
+          >
+            <FiRefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
+          </button>
         </header>
       </div>
 
