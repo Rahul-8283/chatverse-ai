@@ -4,6 +4,7 @@ import { FiTrash2, FiFileText, FiImage, FiMusic, FiRefreshCw } from 'react-icons
 import { BiSolidFilePdf } from 'react-icons/bi';
 import { RiMore2Fill } from 'react-icons/ri';
 import useApiStore from '../store/useApiStore.ts';
+import HelpModal from './HelpModal.tsx';
 import { auth, db } from '../firebase/firebase.ts';
 import { onSnapshot, doc } from 'firebase/firestore';
 import default1 from "../assets/default1.jpg";
@@ -11,6 +12,7 @@ import default1 from "../assets/default1.jpg";
 const DocumentList = () => {
   const { documents, isLoading, isDeleting, fetchDocuments, deleteDocument, deleteAllDocuments } = useApiStore();
   const [user, setUser] = useState(null);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   // Fetch user data
   useEffect(() => {
@@ -99,7 +101,9 @@ const DocumentList = () => {
             <p className="p-0 font-light text-muted-foreground text-[15px]">@{user?.username || "chatverse"}</p>
           </span>
         </main>
-        <button className="bg-muted w-[35px] h-[35px] flex items-center justify-center rounded-lg">
+        <button 
+          onClick={() => setIsHelpOpen(true)}
+          className="bg-muted w-[35px] h-[35px] flex items-center justify-center rounded-lg hover:bg-muted/80 transition-colors">
           <RiMore2Fill className="w-[28px] h-[28px] cursor-pointer text-primary" />
         </button>
       </header>
@@ -178,6 +182,10 @@ const DocumentList = () => {
             </button>
           ))
         )}
+
+      {isHelpOpen && (
+        <HelpModal onClose={() => setIsHelpOpen(false)} />
+      )}
       </main>
     </section>
   );

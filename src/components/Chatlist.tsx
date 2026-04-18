@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { RiMore2Fill } from 'react-icons/ri';
 import SearchModal from './SearchModal.tsx';
+import HelpModal from './HelpModal.tsx';
 import formatTimestamp from '../utils/formatTimestamp.ts';
 import { auth, db, listenForChats } from '../firebase/firebase.ts';
 import { onSnapshot, doc } from 'firebase/firestore';
@@ -10,6 +11,7 @@ const Chatlist = ({ setSelectedUser }) => {
   const [chats, setChats] = useState([]);
   const [user, setUser] = useState(null);
   const [aiBot, setAiBot] = useState(null);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   useEffect(() => {
     const userDocRef = doc(db, "users", auth?.currentUser?.uid);
@@ -71,7 +73,9 @@ const Chatlist = ({ setSelectedUser }) => {
             <p className="p-0 font-light text-muted-foreground text-[15px]">@{user?.username || "chatverse"}</p>
           </span>
         </main>
-        <button className="bg-muted w-[35px] h-[35px] flex items-center justify-center rounded-lg">
+        <button 
+          onClick={() => setIsHelpOpen(true)}
+          className="bg-muted w-[35px] h-[35px] flex items-center justify-center rounded-lg hover:bg-muted/80 transition-colors">
           <RiMore2Fill className="w-[28px] h-[28px] cursor-pointer text-primary" />
         </button>
       </header>
@@ -125,6 +129,10 @@ const Chatlist = ({ setSelectedUser }) => {
               ))}
           </button>
         ))}
+
+      {isHelpOpen && (
+        <HelpModal onClose={() => setIsHelpOpen(false)} />
+      )}
       </main>
     </section>
   )
