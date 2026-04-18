@@ -7,8 +7,12 @@
   [![Vite](https://img.shields.io/badge/Vite-7-646CFF?style=for-the-badge&logo=vite)](https://vitejs.dev/)
   [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-v4-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
   [![Firebase](https://img.shields.io/badge/Firebase-12-FFCA28?style=for-the-badge&logo=firebase)](https://firebase.google.com/)
+  [![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
+  [![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)](https://cloudinary.com/)
   [![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org/)
   [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+  [![Pinecone](https://img.shields.io/badge/Pinecone-27272E?style=for-the-badge&logo=pinecone&logoColor=white)](https://www.pinecone.io/)
+  [![RAG](https://img.shields.io/badge/RAG-Retrieval--Augmented_Generation-blue?style=for-the-badge&logo=ai)](https://en.wikipedia.org/wiki/Large_language_model#Retrieval-augmented_generation)
   
   **[View Live Demo](https://chatverse-ai-chat.vercel.app/)**
 </div>
@@ -24,7 +28,7 @@ With a dark-minimalist UI built on React 19 and Tailwind CSS v4, ChatVerse AI de
 
 The system follows a modern decoupled architecture:
 - **Frontend:** React 19 SPA for real-time interaction and asset management.
-- **Backend:** FastAPI server handling LLM orchestration (Gemini & Groq), RAG processing, and file extraction.
+- **Backend:** FastAPI server handling LLM orchestration, RAG processing, and file extraction.
 - **AI Memory (RAG):** Pinecone (Vector DB) for semantic search and Supabase for persistent file storage.
 - **Real-time Engine:** Firebase Firestore for instant P2P messaging and authentication.
 
@@ -35,7 +39,7 @@ The system follows a modern decoupled architecture:
 ## ✨ Key Features
 
 ### 🧠 Retrieval-Augmented Generation (RAG)
-- **AI Memory:** Upload PDFs, images, or audio files. The system extracts text, generates embeddings via Gemini, and stores them in **Pinecone**.
+- **AI Memory:** Upload PDFs, images, or audio files. The system extracts text, generates embeddings via "gemini-embedding-001", and stores them in **Pinecone**.
 - **Context-Aware Chat:** Toggle RAG mode to ask questions specifically about your uploaded data. The AI retrieves relevant "chunks" to provide grounded, accurate answers.
 - **Document Manager:** Full CRUD support for your AI memory—upload, list, and delete indexed documents.
 
@@ -90,25 +94,38 @@ pip install -r requirements.txt
 
 **Frontend (`chatverse-ai/.env`):**
 ```dotenv
-VITE_FIREBASE_API_KEY="..."
-VITE_CLOUDINARY_CLOUD_NAME="..."
-VITE_CLOUDINARY_UPLOAD_PRESET="..."
+VITE_FIREBASE_API_KEY=your_firebase_api_key_here
+VITE_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_project_id.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
+
+VITE_CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+VITE_CLOUDINARY_UPLOAD_PRESET=your_cloudinary_upload_preset
+
+VITE_APP_MODE=development
 VITE_BACKEND_URL_DEV=http://127.0.0.1:8000
-VITE_BACKEND_URL_PROD="your_deployed_backend_url"
+VITE_BACKEND_URL_PROD=your_deployed_server_link
 ```
 
 **Backend (`chatverse-ai-backend/.env`):**
 ```dotenv
-GEMINI_API_KEY="..."
-GROQ_API_KEY="..."
-PINECONE_API_KEY="..."
-PINECONE_INDEX_NAME="..."
-SUPABASE_URL="..."
-SUPABASE_SECRET_KEY="..."
-# Firebase Admin Credentials
-FIREBASE_PROJECT_ID="..."
-FIREBASE_CLIENT_EMAIL="..."
-FIREBASE_PRIVATE_KEY="..."
+GEMINI_API_KEY=your_gemini_api_key
+GROQ_API_KEY=your_groq_api_key
+
+PINECONE_INDEX_NAME=your_pinecone_index_name
+PINECONE_API_KEY=your_pinecone_api_key
+
+SUPABASE_URL=your_supabase_url
+SUPABASE_BUCKET=your_supabase_bucket_name
+SUPABASE_SECRET_KEY=your_supabase_secret_key
+
+FIREBASE_PROJECT_ID=project_id
+FIREBASE_CLIENT_ID=your_firebase_client_id
+FIREBASE_CLIENT_EMAIL=your_firebase_client_email
+FIREBASE_PRIVATE_KEY=your_firebase_private_key
+FIREBASE_PRIVATE_KEY_ID=your_firebase_private_key_id
 ```
 
 
@@ -122,6 +139,3 @@ FIREBASE_PRIVATE_KEY="..."
 ## 🔗 Project Links
 - **Frontend Repository:** [ChatVerse AI Frontend](https://github.com/Rahul-8283/chatverse-ai)
 - **Backend Repository:** [ChatVerse AI Backend](https://github.com/Rahul-8283/chatverse-ai-backend)
-
----
-<p align="center">Built with ❤️ for the next generation of AI communication.</p>
