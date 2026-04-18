@@ -2,10 +2,10 @@ import React, { useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { FiTrash2, FiFileText, FiImage, FiMusic, FiRefreshCw } from 'react-icons/fi';
 import { BiSolidFilePdf } from 'react-icons/bi';
-import { useDocumentStore } from '../store/useDocumentStore';
+import useApiStore from '../store/useApiStore';
 
 const DocumentList = () => {
-  const { documents, isLoading, isDeleting, fetchDocuments, deleteDocument, deleteAllDocuments } = useDocumentStore();
+  const { documents, isLoading, isDeleting, fetchDocuments, deleteDocument, deleteAllDocuments } = useApiStore();
 
   // Get file icon based on type
   const getFileIcon = (fileType: string) => {
@@ -63,7 +63,7 @@ const DocumentList = () => {
   };
 
   return (
-    <section className="relative hidden lg:flex flex-col item-start justify-start bg-card border-r border-border h-[100vh] w-[100%] md:w-[580px]">
+    <section className="relative hidden lg:flex flex-col justify-start bg-card border-r border-border h-[100vh] w-[100%] md:w-[580px]">
       {/* Header */}
       <div className="flex-shrink-0 p-4 border-b border-border">
         <div className="flex items-center justify-between mb-3">
@@ -88,7 +88,7 @@ const DocumentList = () => {
       </div>
 
       {/* Documents List */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto min-h-0">
         {isLoading && documents.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <p className="text-muted-foreground text-sm">Loading documents...</p>
@@ -140,13 +140,13 @@ const DocumentList = () => {
         )}
       </div>
 
-      {/* Footer */}
-      <div className="flex-shrink-0 p-3 border-t border-border text-xs text-muted-foreground text-center">
+      {/* Footer - Always Visible */}
+      <div className="flex-shrink-0 p-3 border-t border-border">
         {documents.length > 0 && (
           <button
             onClick={() => fetchDocuments()}
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-2 py-2 px-3 hover:bg-muted/50 rounded transition-colors disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 py-2 px-3 hover:bg-muted/50 rounded transition-colors disabled:opacity-50 text-sm text-muted-foreground hover:text-foreground"
             title="Refresh documents"
           >
             <FiRefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
