@@ -11,7 +11,13 @@ const Navlinks = ({ isRagMode, setIsRagMode }) => {
   const { theme, toggleTheme } = useTheme();
 
   const handleLogout = async () => {
+    const confirmLogout = window.confirm("Are you sure you want to logout?");
+    
+    if (!confirmLogout) return;
+    
     try {
+      // Clear the tutorial flag on logout so it shows again on next login
+      sessionStorage.removeItem('hasSeenDocumentTutorial');
       await signOut(auth);
     } 
     catch(error){

@@ -72,8 +72,10 @@ interface ApiStore {
   error: string | null;
   documents: Document[];
   isDeleting: Record<string, boolean>;
+  isDocumentTutorialOpen: boolean;
 
   // Methods
+  setIsDocumentTutorialOpen: (isOpen: boolean) => void;
   sendChat: (params: ChatParams) => Promise<ChatResponse>;
   sendImageScan: (file: File, prompt?: string) => Promise<ImageScanResponse>;
   sendVoice: (audioBlob: Blob) => Promise<VoiceResponse>;
@@ -90,6 +92,9 @@ export const useApiStore = create<ApiStore>((set) => ({
   error: null,
   documents: [],
   isDeleting: {},
+  isDocumentTutorialOpen: false,
+
+  setIsDocumentTutorialOpen: (isOpen: boolean) => set({ isDocumentTutorialOpen: isOpen }),
 
   sendChat: async ({ message, history, persona }: ChatParams): Promise<ChatResponse> => {
     set({ isLoading: true, error: null });
