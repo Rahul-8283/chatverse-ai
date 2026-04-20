@@ -42,12 +42,12 @@ const DocumentTutorialModal = ({ setIsRagMode }) => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-secondary border border-accent rounded-2xl shadow-2xl p-8 w-[90vw] max-w-md z-[201]"
+            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card border border-accent rounded-2xl shadow-2xl p-8 w-[90vw] max-w-md z-[201]"
           >
             {/* Close Button */}
             <button
               onClick={closeModal}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-300 transition-colors"
+              className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
             >
               <FiX size={24} />
             </button>
@@ -60,26 +60,26 @@ const DocumentTutorialModal = ({ setIsRagMode }) => {
               </div>
 
               {/* Title */}
-              <h2 className="text-2xl font-bold text-white mb-3">
+              <h2 className="text-2xl font-bold text-foreground mb-3">
                 Unlock Document Mode
               </h2>
 
               {/* Description */}
-              <p className="text-gray-300 text-sm leading-relaxed mb-6">
-                Upload your documents and chat with them instantly using RAG (Retrieval-Augmented Generation). Get summaries, find information, and extract insights from your files with the power of AI.
+              <p className="text-muted-foreground text-sm leading-relaxed mb-6">
+                Upload your documents and chat with them instantly using AI. Get summaries, find information, and extract insights from your files with the power of AI.
               </p>
 
               {/* Feature Highlights */}
               <ul className="space-y-3 mb-8 w-full">
-                <li className="flex items-center gap-3 text-gray-200 text-sm">
+                <li className="flex items-center gap-3 text-muted-foreground text-sm">
                   <div className="w-1.5 h-1.5 bg-accent rounded-full" />
                   Smart document analysis with AI
                 </li>
-                <li className="flex items-center gap-3 text-gray-200 text-sm">
+                <li className="flex items-center gap-3 text-muted-foreground text-sm">
                   <div className="w-1.5 h-1.5 bg-accent rounded-full" />
                   Ask questions about your files
                 </li>
-                <li className="flex items-center gap-3 text-gray-200 text-sm">
+                <li className="flex items-center gap-3 text-muted-foreground text-sm">
                   <div className="w-1.5 h-1.5 bg-accent rounded-full" />
                   Works with PDFs, images, and text files
                 </li>
@@ -89,13 +89,13 @@ const DocumentTutorialModal = ({ setIsRagMode }) => {
               <div className="flex gap-3 w-full">
                 <button
                   onClick={handleTryNow}
-                  className="flex-1 bg-accent text-white font-bold py-3 px-4 rounded-lg border-2 border-accent hover:bg-accent/90 hover:border-white transition-all transform flex items-center justify-center gap-2"
+                  className="flex-1 bg-primary text-primary-foreground font-bold py-3 px-4 rounded-lg border-2 border-primary shadow-lg hover:bg-primary/90 hover:border-accent transition-all flex items-center justify-center gap-2"
                 >
                   Try Now <FiArrowRight size={18} />
                 </button>
                 <button
                   onClick={closeModal}
-                  className="flex-1 bg-primary/85 text-gray-300 font-semibold py-3 px-4 rounded-lg hover:bg-primary/70 transition-colors"
+                  className="flex-1 bg-muted text-foreground font-semibold py-3 px-4 rounded-lg hover:bg-muted/80 transition-colors"
                 >
                   Maybe Later
                 </button>
