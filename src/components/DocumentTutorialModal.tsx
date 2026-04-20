@@ -116,7 +116,7 @@ const DocumentTutorialModal = () => {
             <motion.div
               animate={{ boxShadow: ['0 0 30px 15px rgba(141,184,122,0.4)', '0 0 40px 20px rgba(141,184,122,0.3)', '0 0 30px 15px rgba(141,184,122,0.4)'] }}
               transition={{ duration: 2, repeat: Infinity }}
-              className="absolute lg:left-[62px] left-[50%] lg:top-[85px] top-[20px] -translate-x-1/2 lg:translate-x-0 w-12 h-12 rounded-full border-2 border-accent/50"
+              className="absolute lg:left-[22px] left-[50%] lg:top-[111px] top-[20px] -translate-x-1/2 lg:translate-x-0 w-12 h-12 rounded-full border-2 border-accent/50"
             />
           </motion.div>
         </>
