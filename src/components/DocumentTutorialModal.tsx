@@ -42,7 +42,7 @@ const DocumentTutorialModal = ({ setIsRagMode }) => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary-200 border border-accent rounded-2xl shadow-2xl p-8 w-[90vw] max-w-md z-[201]"
+            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-secondary border border-accent rounded-2xl shadow-2xl p-8 w-[90vw] max-w-md z-[201]"
           >
             {/* Close Button */}
             <button
