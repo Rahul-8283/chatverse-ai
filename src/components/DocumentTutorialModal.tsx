@@ -39,7 +39,7 @@ const DocumentTutorialModal = () => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-secondary border border-white/10 rounded-2xl shadow-2xl p-8 w-[90vw] max-w-md z-[201]"
+            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-secondary border border-accent/40 rounded-2xl shadow-2xl p-8 w-[90vw] max-w-md z-[201]"
           >
             {/* Close Button */}
             <button
@@ -97,11 +97,6 @@ const DocumentTutorialModal = () => {
                   Maybe Later
                 </button>
               </div>
-            </div>
-
-            {/* Animated Border */}
-            <div className="absolute inset-0 rounded-2xl pointer-events-none overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-accent/0 via-accent/20 to-accent/0 opacity-0 animate-pulse" />
             </div>
           </motion.div>
 
