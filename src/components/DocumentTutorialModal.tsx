@@ -114,7 +114,7 @@ const DocumentTutorialModal = ({ setIsRagMode }) => {
             <motion.div
               animate={{ boxShadow: ['0 0 50px 25px rgba(141,184,122,0.8), 0 0 80px 40px rgba(141,184,122,0.4)', '0 0 70px 35px rgba(141,184,122,0.7), 0 0 100px 50px rgba(141,184,122,0.3)', '0 0 50px 25px rgba(141,184,122,0.8), 0 0 80px 40px rgba(141,184,122,0.4)'] }}
               transition={{ duration: 2, repeat: Infinity }}
-              className="absolute lg:left-[14px] left-[50%] lg:top-[103px] top-[20px] -translate-x-1/2 lg:translate-x-0 w-16 h-16 rounded-full border-4 border-accent shadow-2xl"
+              className="absolute lg:left-[14px] left-[50%] lg:top-[103px] top-[20px] -translate-x-1/2 lg:translate-x-0 w-16 h-16 rounded-full border-3 border-accent bg-accent/80 shadow-2xl"
             />
           {/* </motion.div> */}
           </motion.div>
