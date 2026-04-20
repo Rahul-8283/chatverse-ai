@@ -786,7 +786,7 @@ const AIChatbot = ({ isRagMode, setIsRagMode }) => {
                     : isLoading ? "AI is thinking..."
                       : isRecording ? "Recording audio..."
                         : imageFile ? "Add a question about the image..."
-                          : "Message @ChatVerse-AI..."
+                          : "Ask a question..."
                 }
               />
 
