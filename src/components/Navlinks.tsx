@@ -16,6 +16,8 @@ const Navlinks = ({ isRagMode, setIsRagMode }) => {
     if (!confirmLogout) return;
     
     try {
+      // Clear the tutorial flag on logout so it shows again on next login
+      sessionStorage.removeItem('hasSeenDocumentTutorial');
       await signOut(auth);
     } 
     catch(error){

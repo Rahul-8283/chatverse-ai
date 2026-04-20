@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 import Login from "./components/Login.tsx";
 import Register from "./components/Register.tsx";
 import Navlinks from "./components/Navlinks.tsx";
@@ -9,7 +10,10 @@ import Chatlist from "./components/Chatlist.tsx";
 import DocumentList from "./components/DocumentList.tsx";
 import AIChatbot from "./components/AIChatbot.tsx";
 import SplashScreen from "./components/SplashScreen.tsx";
+import DocumentTutorialModal from "./components/DocumentTutorialModal.tsx";
 import { auth, db, initializeAIBot } from "./firebase/firebase.ts";
+import useApiStore from "./store/useApiStore.ts";
+
 import logo from "./assets/logo.png";
 
 const App = () => {
@@ -18,6 +22,7 @@ const App = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [showSplash, setShowSplash] = useState(true);
     const [isRagMode, setIsRagMode] = useState(false);
+    const { setIsDocumentTutorialOpen } = useApiStore();
 
     useEffect(() => {
         const currentUser = auth.currentUser;
@@ -25,6 +30,15 @@ const App = () => {
             setUser(currentUser);
             // Initialize AI Bot when user is authenticated
             initializeAIBot();
+
+            // Show document tutorial on first login per session
+            const hasSeenTutorial = sessionStorage.getItem('hasSeenDocumentTutorial');
+            if (!hasSeenTutorial) {
+                setTimeout(() => {
+                    setIsDocumentTutorialOpen(true);
+                    sessionStorage.setItem('hasSeenDocumentTutorial', 'true');
+                }, 500); // Delay to let splash screen finish
+            }
         }
 
         const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -32,11 +46,20 @@ const App = () => {
             if (user) {
                 // Initialize AI Bot when user logs in
                 initializeAIBot();
+
+                // Show document tutorial on first login per session
+                const hasSeenTutorial = sessionStorage.getItem('hasSeenDocumentTutorial');
+                if (!hasSeenTutorial) {
+                    setTimeout(() => {
+                        setIsDocumentTutorialOpen(true);
+                        sessionStorage.setItem('hasSeenDocumentTutorial', 'true');
+                    }, 500); // Delay to let splash screen finish
+                }
             }
         });
 
         return () => unsubscribe();
-    }, []);
+    }, [setIsDocumentTutorialOpen]);
 
     if (showSplash) {
         return <SplashScreen onFinish={() => setShowSplash(false)} />;
@@ -44,6 +67,8 @@ const App = () => {
 
     return (
         <div>
+            <DocumentTutorialModal />
+            
             <ToastContainer 
                 position="top-right"
                 autoClose={3000}
