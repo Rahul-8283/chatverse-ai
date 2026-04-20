@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiFileText, FiX, FiArrowRight } from 'react-icons/fi';
 import useApiStore from '../store/useApiStore.ts';
 
-const DocumentTutorialModal = () => {
+const DocumentTutorialModal = ({ setIsRagMode }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { isDocumentTutorialOpen, setIsDocumentTutorialOpen } = useApiStore();
 
@@ -17,7 +17,10 @@ const DocumentTutorialModal = () => {
 
   const handleTryNow = () => {
     closeModal();
-    // Trigger document mode switch if needed
+    // Switch to RAG mode when user clicks Try Now
+    if(setIsRagMode){
+      setIsRagMode(true);
+    }
   };
 
   return (
@@ -39,7 +42,7 @@ const DocumentTutorialModal = () => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-secondary border border-accent/40 rounded-2xl shadow-2xl p-8 w-[90vw] max-w-md z-[201]"
+            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary-200 border border-accent rounded-2xl shadow-2xl p-8 w-[90vw] max-w-md z-[201]"
           >
             {/* Close Button */}
             <button
@@ -86,7 +89,7 @@ const DocumentTutorialModal = () => {
               <div className="flex gap-3 w-full">
                 <button
                   onClick={handleTryNow}
-                  className="flex-1 bg-accent text-white font-bold py-3 px-4 rounded-lg hover:bg-accent/90 transition-all transform hover:scale-105 flex items-center justify-center gap-2"
+                  className="flex-1 bg-accent text-white font-bold py-3 px-4 rounded-lg border-2 border-accent hover:bg-accent/90 hover:border-white transition-all transform flex items-center justify-center gap-2"
                 >
                   Try Now <FiArrowRight size={18} />
                 </button>

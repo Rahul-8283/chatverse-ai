@@ -67,7 +67,7 @@ const App = () => {
 
     return (
         <div>
-            <DocumentTutorialModal />
+            <DocumentTutorialModal setIsRagMode={setIsRagMode} />
             
             <ToastContainer 
                 position="top-right"
