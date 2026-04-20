@@ -44,7 +44,7 @@ const DocumentTutorialModal = () => {
             {/* Close Button */}
             <button
               onClick={closeModal}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-300 transition-colors"
             >
               <FiX size={24} />
             </button>
@@ -52,7 +52,7 @@ const DocumentTutorialModal = () => {
             {/* Content */}
             <div className="flex flex-col items-start">
               {/* Icon */}
-              <div className="p-3 bg-primary rounded-lg border border-accent/30 mb-6">
+              <div className="p-3 bg-primary/85 rounded-lg border border-accent/30 mb-6">
                 <FiFileText size={32} className="text-accent" />
               </div>
 
@@ -92,7 +92,7 @@ const DocumentTutorialModal = () => {
                 </button>
                 <button
                   onClick={closeModal}
-                  className="flex-1 bg-primary/50 text-gray-300 font-semibold py-3 px-4 rounded-lg hover:bg-primary/70 transition-colors"
+                  className="flex-1 bg-primary/85 text-gray-300 font-semibold py-3 px-4 rounded-lg hover:bg-primary/70 transition-colors"
                 >
                   Maybe Later
                 </button>
